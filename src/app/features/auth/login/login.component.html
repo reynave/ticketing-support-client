@@ -1,0 +1,92 @@
+<div class="login-page">
+  <div class="decor decor-left"></div>
+  <div class="decor decor-right"></div>
+
+  <div class="container py-5">
+    <div class="row justify-content-center align-items-center min-vh-100 g-4">
+      <div class="col-12 col-lg-6">
+        <div class="brand-panel p-4 p-md-5">
+          <p class="eyebrow mb-2">Thinktank Client Portal</p>
+          <h1 class="display-6 fw-semibold mb-3">Akses cepat ke semua CASES Anda.</h1>
+          <p class="lead-text mb-0">
+            Pantau progres case, status, dan update terbaru dalam satu dashboard client yang ringkas.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-8 col-lg-5">
+        <div class="card login-card border-0 shadow-lg">
+          <div class="card-body p-4 p-md-5">
+            <h2 class="h4 fw-semibold mb-1">Masuk</h2>
+            <p class="text-muted mb-4">Gunakan akun client Anda untuk melanjutkan.</p>
+
+            <div *ngIf="errorMessage" class="alert alert-danger py-2" role="alert">
+              {{ errorMessage }}
+            </div>
+
+            <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" novalidate>
+              <div class="mb-3">
+                <label class="form-label" for="email">Email</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  class="form-control form-control-lg"
+                  [(ngModel)]="formModel.email"
+                  required
+                  email
+                  #emailModel="ngModel"
+                  placeholder="nama@perusahaan.com"
+                />
+                <div *ngIf="emailModel.invalid && (emailModel.dirty || emailModel.touched)" class="invalid-text mt-1">
+                  Email wajib diisi dengan format valid.
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="password">Password</label>
+                <div class="input-group input-group-lg">
+                  <input
+                    id="password"
+                    name="password"
+                    [type]="showPassword ? 'text' : 'password'"
+                    class="form-control"
+                    [(ngModel)]="formModel.password"
+                    required
+                    minlength="6"
+                    #passwordModel="ngModel"
+                    placeholder="Masukkan password"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="togglePassword()"
+                    [attr.aria-label]="showPassword ? 'Sembunyikan password' : 'Tampilkan password'"
+                  >
+                    {{ showPassword ? 'Hide' : 'Show' }}
+                  </button>
+                </div>
+                <div
+                  *ngIf="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)"
+                  class="invalid-text mt-1"
+                >
+                  Password wajib diisi (minimal 6 karakter).
+                </div>
+
+                 <div class="alert alert-info my-4 d-flex gap-2 align-items-start mb-3">
+      <i class="bi bi-info-circle-fill mt-1 flex-shrink-0"></i>
+      <span>Demo: use <strong>admin&#64;thinktank.local</strong> / <strong>Admin123!</strong></span>
+    </div>
+              </div>
+
+              <button type="submit" class="btn btn-accent btn-lg w-100" [disabled]="loginForm.invalid || loading">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                {{ loading ? 'Memproses...' : 'Masuk ke Cases' }}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

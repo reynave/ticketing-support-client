@@ -1,13 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  template: '<router-outlet></router-outlet>',
 })
-export class AppComponent {
-  title = 'ng18-client';
+export class AppComponent implements OnInit {
+  private readonly authService = inject(AuthService);
+
+  ngOnInit(): void {
+    this.authService.bootstrapSession();
+  }
 }

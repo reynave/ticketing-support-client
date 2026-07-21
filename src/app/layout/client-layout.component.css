@@ -1,0 +1,85 @@
+:host {
+  display: block;
+}
+
+.client-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 181, 95, 0.16), transparent 35%),
+    radial-gradient(circle at 0% 100%, rgba(21, 137, 118, 0.14), transparent 28%),
+    #f8fbfb;
+}
+
+.topbar {
+  background: linear-gradient(110deg, #0e6355 0%, #0b4f63 75%, #355d78 100%);
+  box-shadow: 0 8px 24px rgba(13, 56, 73, 0.2);
+}
+
+.nav-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.nav-tabs-client {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+  gap: 0.2rem;
+}
+
+.navbar-brand {
+  color: #f3fffb;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.navbar-brand:hover {
+  color: #f3fffb;
+}
+
+.nav-link {
+  color: rgba(237, 250, 248, 0.78);
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+}
+
+.nav-link.active,
+.nav-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.14);
+}
+
+.user-pill {
+  color: #f3fffb;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  padding: 0.32rem 0.7rem;
+  font-size: 0.82rem;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-actions {
+  margin-left: auto;
+}
+
+.navbar,
+.btn,
+.nav-link,
+.navbar-brand,
+.user-pill {
+  font-family: 'Sora', sans-serif;
+}
+
+@media (max-width: 767.98px) {
+  .user-actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+}

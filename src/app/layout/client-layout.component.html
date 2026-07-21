@@ -1,0 +1,24 @@
+<div class="client-shell">
+  <nav class="navbar navbar-expand-lg topbar sticky-top">
+    <div class="container-fluid px-3 px-md-4 nav-wrap">
+      <a class="navbar-brand" routerLink="/cases">Thinktank Client</a>
+
+      <ul class="navbar-nav nav-tabs-client">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/cases" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            Cases
+          </a>
+        </li>
+      </ul>
+
+      <div class="d-flex align-items-center gap-3 user-actions">
+        <span class="user-pill" *ngIf="(user$ | async) as user">{{ user?.name || user?.email || 'Client User' }}</span>
+        <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container-fluid px-3 px-md-4 py-4">
+    <router-outlet></router-outlet>
+  </main>
+</div>

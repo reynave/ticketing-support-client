@@ -1,0 +1,88 @@
+<div class="container">
+    
+<section class="cases-wrap">
+  <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+      <p class="label mb-1">Client Cases</p>
+      <h1 class="h3 mb-0">Daftar CASES</h1>
+    </div>
+    <button class="btn btn-outline-primary" (click)="loadCases()" [disabled]="loading">Refresh</button>
+  </div>
+
+  <div class="card border-0 shadow-sm filter-card mb-3">
+    <div class="card-body p-3 p-md-4">
+      <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-5">
+          <label for="keyword" class="form-label">Cari Judul / Nomor</label>
+          <input
+            id="keyword"
+            type="text"
+            class="form-control"
+            [(ngModel)]="keyword"
+            placeholder="Contoh: CASE-2026-001"
+            (keyup.enter)="loadCases()"
+          />
+        </div>
+
+        <div class="col-12 col-md-4 col-lg-3">
+          <label for="status" class="form-label">Status</label>
+          <select id="status" class="form-select" [(ngModel)]="selectedStatus">
+            <option value="">Semua</option>
+            <option value="1">Open</option>
+            <option value="900">Closed</option>
+            <option value="990">Cancelled</option>
+          </select>
+        </div>
+
+        <div class="col-12 col-md-2 col-lg-4 d-flex align-items-end gap-2">
+          <button class="btn btn-primary flex-grow-1" (click)="loadCases()" [disabled]="loading">Filter</button>
+          <button class="btn btn-light border" (click)="resetFilters()" [disabled]="loading">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+
+  <div *ngIf="loading" class="card border-0 shadow-sm">
+    <div class="card-body py-4 d-flex align-items-center gap-3">
+      <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+      <span>Sedang memuat cases...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !rows.length" class="card border-0 shadow-sm">
+    <div class="card-body py-5 text-center">
+      <h2 class="h5 mb-2">Belum ada data CASES</h2>
+      <p class="text-muted mb-0">Silakan ubah filter atau coba refresh data.</p>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && rows.length" class="row g-3">
+    <div class="col-12" *ngFor="let row of rows; trackBy: trackByCase">
+      <article class="card border-0 shadow-sm case-item h-100" (click)="openDetail(row)">
+        <div class="card-body p-2 p-md-3">
+          <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-2">
+            <div>
+              <p class="case-id mb-1">{{ row?.crNoRef || row?.id || '-' }}</p>
+              <h3 class="h5 mb-1">{{ row?.title || 'Untitled Case' }}</h3>
+              <p class="text-muted mb-0">{{ row?.projectName || row?.projectId || '-' }}</p>
+            </div>
+            <span class="badge text-bg-light border">{{ row?.ticketStatusName || row?.ticketStatusId || 'N/A' }}</span>
+          </div> 
+          <div class="meta d-flex flex-wrap gap-3">
+           <span><strong>Submit :</strong> {{ row?.submitDate || row?.inputDate || '-' }}</span>
+            |
+            <span><strong>Assign :</strong> {{ row?.assignToName || row?.assignTo || '-' }}</span>
+           |
+            <span><strong>Severity :</strong> {{ row?.ticketSeverityName  || '-' }}</span>
+          </div>
+
+         
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+</div>

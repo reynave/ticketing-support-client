@@ -1,0 +1,69 @@
+:host {
+  display: block;
+}
+
+.cases-wrap {
+  font-family: 'Sora', sans-serif;
+}
+
+.label {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0c6f63;
+  font-weight: 700;
+}
+
+.filter-card {
+  border-radius: 16px;
+}
+
+.case-item {
+  border-radius: 16px;
+  border-left: 5px solid #0f7a68 !important;
+  animation: pop-in 320ms ease-out both;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.case-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.8rem 1.3rem rgba(19, 91, 80, 0.12) !important;
+}
+
+.case-id {
+  font-size: 0.8rem;
+  color: #1f8475;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.desc {
+  color: #445d59;
+}
+
+.meta {
+  color: #35504c;
+  font-size: 0.9rem;
+}
+
+.open-detail {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e7f6f;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

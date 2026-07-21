@@ -1,0 +1,124 @@
+:host {
+  display: block;
+}
+
+.login-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(232, 247, 242, 0.95), transparent 40%),
+    radial-gradient(circle at 85% 15%, rgba(255, 238, 214, 0.9), transparent 30%),
+    linear-gradient(140deg, #f3f7f8 0%, #fffdf8 55%, #f9f3ea 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.decor {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(1px);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.decor-left {
+  width: 260px;
+  height: 260px;
+  left: -120px;
+  top: 8%;
+  background: linear-gradient(145deg, rgba(0, 141, 122, 0.28), rgba(0, 141, 122, 0));
+}
+
+.decor-right {
+  width: 320px;
+  height: 320px;
+  right: -160px;
+  bottom: 10%;
+  background: linear-gradient(145deg, rgba(242, 139, 28, 0.26), rgba(242, 139, 28, 0));
+}
+
+.brand-panel {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 84, 72, 0.12);
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  transform: translateY(8px);
+  animation: lift-in 520ms ease-out both;
+}
+
+.eyebrow {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0e7a67;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.lead-text {
+  color: #32524d;
+  max-width: 48ch;
+}
+
+.login-card {
+  border-radius: 22px;
+  animation: rise-in 480ms ease-out both;
+}
+
+.form-control,
+.btn,
+.form-label,
+.text-muted,
+.alert,
+.lead-text,
+.eyebrow,
+h1,
+h2 {
+  font-family: 'Sora', sans-serif;
+}
+
+.btn-accent {
+  background-color: #0f7a68;
+  border-color: #0f7a68;
+  color: #fff;
+}
+
+.btn-accent:hover,
+.btn-accent:focus {
+  background-color: #0b6d5d;
+  border-color: #0b6d5d;
+  color: #fff;
+}
+
+.invalid-text {
+  color: #c13d2b;
+  font-size: 0.8rem;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lift-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(8px);
+  }
+}
+
+@media (max-width: 991.98px) {
+  .brand-panel {
+    transform: none;
+  }
+}
