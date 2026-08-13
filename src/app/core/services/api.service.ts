@@ -19,6 +19,10 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiBaseUrl}${path}`, body);
   }
 
+  put(path: string, body: any): Observable<any> {
+    return this.http.put<any>(`${environment.apiBaseUrl}${path}`, body);
+  }
+
   private buildParams(query: Record<string, string | number | boolean | null | undefined>): HttpParams {
     let params = new HttpParams();
 

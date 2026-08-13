@@ -1,0 +1,45 @@
+:host {
+  display: block;
+}
+
+.project-detail-wrap {
+  font-family: 'Sora', sans-serif;
+}
+
+.detail-card {
+  border-left: 5px solid #0f7a68 !important;
+  border-radius: 16px;
+}
+
+.project-id {
+  font-size: 0.8rem;
+  color: #1f8475;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.meta-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6d8783;
+  font-weight: 700;
+}
+
+.meta-value {
+  color: #234d47;
+  font-weight: 600;
+}
+
+.log-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.log-item {
+  border: 1px solid #e4ecea;
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  background-color: #fbfdfd;
+}

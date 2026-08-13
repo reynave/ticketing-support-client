@@ -9,10 +9,15 @@
             Cases
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/projects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            Projects
+          </a>
+        </li>
       </ul>
 
       <div class="d-flex align-items-center gap-3 user-actions">
-        <span class="user-pill" *ngIf="(user$ | async) as user">{{ user?.name || user?.email || 'Client User' }}</span>
+        <a class="user-pill" routerLink="/profile" *ngIf="(user$ | async) as user">{{ user?.name || user?.email || 'Client User' }}</a>
         <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
       </div>
     </div>

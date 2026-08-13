@@ -17,6 +17,7 @@ interface CaseCreateForm {
   ticketCategoryId: string;
   severityId: string;
   deadlineDateTime: string;
+  productChildId: string;
 }
 
 @Component({
@@ -51,6 +52,7 @@ export class CaseListComponent implements OnInit {
   allTicketCategories: any[] = [];
   ticketCategories: any[] = [];
   assignUsers: any[] = [];
+  modules: any[] = [];
 
   formModel: CaseCreateForm = this.defaultForm();
 
@@ -63,9 +65,7 @@ export class CaseListComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    const query: any = {
-      closed: 0,
-    };
+    const query: any = {};
 
     if (this.keyword.trim()) {
       query.keyword = this.keyword.trim();
@@ -83,7 +83,8 @@ export class CaseListComponent implements OnInit {
       error: (error) => {
         this.loading = false;
         this.rows = [];
-        this.errorMessage = error?.error?.message || 'Gagal memuat daftar cases.';
+        this.errorMessage =
+          error?.error?.message || 'Gagal memuat daftar cases.';
       },
     });
   }
@@ -97,10 +98,11 @@ export class CaseListComponent implements OnInit {
   openCreateModal(content: any): void {
     this.formModel = this.defaultForm();
     this.assignUsers = [];
+    this.modules = [];
     this.modalErrorMessage = '';
 
     this.modalRef = this.modalService.open(content, {
-      size: 'lg', 
+      size: 'lg',
     });
 
     this.modalRef.result.finally(() => {
@@ -118,8 +120,16 @@ export class CaseListComponent implements OnInit {
   }
 
   onProjectChanged(): void {
-    const selectedProject = this.projects.find((project) => String(project?.id) === String(this.formModel.projectId));
-    this.assignUsers = Array.isArray(selectedProject?.users) ? selectedProject.users : [];
+    const selectedProject = this.projects.find(
+      (project) => String(project?.id) === String(this.formModel.projectId),
+    );
+    this.assignUsers = Array.isArray(selectedProject?.users)
+      ? selectedProject.users
+      : [];
+    this.modules = Array.isArray(selectedProject?.modules)
+      ? selectedProject.modules
+      : [];
+    this.formModel.productChildId = '';
 
     const parentCategoryId = selectedProject?.ticketCategoriesParentId;
 
@@ -130,14 +140,18 @@ export class CaseListComponent implements OnInit {
       return;
     }
 
-    const parentCategory = this.allTicketCategories.find((category) => String(category?.id) === String(parentCategoryId));
-    const children = Array.isArray(parentCategory?.children) ? parentCategory.children : [];
+    const parentCategory = this.allTicketCategories.find(
+      (category) => String(category?.id) === String(parentCategoryId),
+    );
+    const children = Array.isArray(parentCategory?.children)
+      ? parentCategory.children
+      : [];
 
     this.ticketCategories = children;
     this.formModel.ticketCategoryId = '';
     this.formModel.assignTo = '';
   }
-
+addHour : number = 0;
   submitCreate(form: NgForm): void {
     if (form.invalid || this.saving) {
       return;
@@ -146,7 +160,8 @@ export class CaseListComponent implements OnInit {
     const submitBy = this.resolveSubmitBy();
 
     if (!submitBy) {
-      this.modalErrorMessage = 'Session user tidak ditemukan. Silakan login ulang.';
+      this.modalErrorMessage =
+        'Session user tidak ditemukan. Silakan login ulang.';
       return;
     }
 
@@ -160,31 +175,79 @@ export class CaseListComponent implements OnInit {
     const futureDate = new Date(today.getTime() + 50 * 60 * 1000);
     const futureHhiiss = `${String(futureDate.getHours()).padStart(2, '0')}:${String(futureDate.getMinutes()).padStart(2, '0')}:${String(futureDate.getSeconds()).padStart(2, '0')}`;
 
+    this.apiService.get(`/project/${this.formModel.projectId}`).subscribe({
+      next: (response) => {
+        this.loading = false;
+        const users = response?.data.users || null;
 
-    const payload: any = {
-      title: this.formModel.title.trim(),
-      description: this.formModel.description.trim(),
-      projectId: this.formModel.projectId,
-      submitBy,
-      submitDate: this.formModel.submitDate+`T${hhiiss}`,
-      targetCompletionDate: futureHhiiss,
-      assignTo: this.formModel.assignTo,
-      ticketStatusId: Number(this.formModel.ticketStatusId),
-      ticketCategoryId: this.formModel.ticketCategoryId ? Number(this.formModel.ticketCategoryId) : null,
-      severityId: this.formModel.severityId ? Number(this.formModel.severityId) : null,
-      deadlineDateTime: futureHhiiss,
-    };
+        // cari asManager = 1
+        let asManager = users?.find((user: any) => user?.asManager === 1) || null;
+        console.log('users', users);
 
-    this.apiService.post('/cases', payload).subscribe({
-      next: () => {
-        this.saving = false;
-        this.modalRef?.close();
-        this.successMessage = 'Case berhasil dibuat.';
-        this.loadCases();
+        if (!asManager) {
+          asManager = users?.[0] || null;
+        }
+        console.log('asManager', asManager.id);
+
+
+       const today = new Date();
+
+    // saya mau hhiiss ditambah 3 jam
+
+        this.addHour = this.ticketSeverities.find((severity: any) => String(severity?.id) === String(this.formModel.severityId))?.addHour || 0;
+
+    const addHour = this.addHour;
+    const threeHoursLater = new Date(
+      today.getTime() + addHour * 60 * 60 * 1000,
+    );
+    const hhiissPlus = threeHoursLater.toTimeString().split(' ')[0];
+    const deadlineDateTime =
+      `${this.formModel.submitDate}` +
+      ' ' +
+      hhiissPlus;
+
+
+
+        const payload: any = {
+          title: this.formModel.title.trim(),
+          description: this.formModel.description.trim(),
+          projectId: this.formModel.projectId,
+          submitBy,
+          submitDate: this.formModel.submitDate + `T${hhiiss}`,
+          targetCompletionDate: futureHhiiss,
+          ticketStatusId: Number(this.formModel.ticketStatusId),
+          ticketCategoryId: this.formModel.ticketCategoryId
+            ? Number(this.formModel.ticketCategoryId)
+            : null,
+          severityId: this.formModel.severityId
+            ? Number(this.formModel.severityId)
+            : null,
+          deadlineDateTime: deadlineDateTime,
+          productChildId: this.formModel.productChildId
+            ? Number(this.formModel.productChildId)
+            : null,
+          assignTo: asManager.id ,
+          
+        };
+
+        this.apiService.post('/cases', payload).subscribe({
+          next: () => {
+            this.saving = false;
+            this.modalRef?.close();
+            this.successMessage = 'Case berhasil dibuat.';
+            this.loadCases();
+          },
+          error: (error) => {
+            this.saving = false;
+            this.modalErrorMessage =
+              error?.error?.message || 'Gagal membuat case.';
+          },
+        });
       },
       error: (error) => {
-        this.saving = false;
-        this.modalErrorMessage = error?.error?.message || 'Gagal membuat case.';
+        this.loading = false;
+        this.errorMessage =
+          error?.error?.message || 'Gagal memuat detail project.';
       },
     });
   }
@@ -208,23 +271,31 @@ export class CaseListComponent implements OnInit {
 
     this.apiService.get('/project', { status: 1 }).subscribe({
       next: (projectResponse) => {
-        this.projects = Array.isArray(projectResponse?.data) ? projectResponse.data : [];
+        this.projects = Array.isArray(projectResponse?.data)
+          ? projectResponse.data
+          : [];
 
         this.apiService.get('/ticket-categories', { presence: 1 }).subscribe({
           next: (categoryResponse) => {
-            this.allTicketCategories = Array.isArray(categoryResponse?.data) ? categoryResponse.data : [];
+            this.allTicketCategories = Array.isArray(categoryResponse?.data)
+              ? categoryResponse.data
+              : [];
             this.ticketCategories = [];
 
-            this.apiService.get('/master/ticket-severities', { presence: 1 }).subscribe({
-              next: (severityResponse) => {
-                this.ticketSeverities = Array.isArray(severityResponse?.data) ? severityResponse.data : [];
-                this.loadingOptions = false;
-              },
-              error: () => {
-                this.ticketSeverities = [];
-                this.loadingOptions = false;
-              },
-            });
+            this.apiService
+              .get('/master/ticket-severities', { presence: 1 })
+              .subscribe({
+                next: (severityResponse) => {
+                  this.ticketSeverities = Array.isArray(severityResponse?.data)
+                    ? severityResponse.data
+                    : [];
+                  this.loadingOptions = false;
+                },
+                error: () => {
+                  this.ticketSeverities = [];
+                  this.loadingOptions = false;
+                },
+              });
           },
           error: () => {
             this.allTicketCategories = [];
@@ -274,6 +345,7 @@ export class CaseListComponent implements OnInit {
       ticketCategoryId: '',
       severityId: '',
       deadlineDateTime: '',
+      productChildId: '',
     };
   }
 }

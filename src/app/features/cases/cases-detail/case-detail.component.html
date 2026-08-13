@@ -1,80 +1,106 @@
 <div class="container">
 
-<section class="case-detail-wrap">
-  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
-    <button type="button" class="btn btn-outline-secondary" (click)="goBack()">Kembali</button>
-    <button type="button" class="btn btn-outline-primary" (click)="loadDetail()" [disabled]="loading">Refresh</button>
-  </div>
-
-  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</div>
-
-  <div *ngIf="loading" class="card border-0 shadow-sm">
-    <div class="card-body py-4 d-flex align-items-center gap-3">
-      <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
-      <span>Memuat detail case...</span>
+  <section class="case-detail-wrap">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+      <button type="button" class="btn btn-outline-secondary" (click)="goBack()">Back</button>
+      <button type="button" class="btn btn-outline-primary" (click)="loadDetail()" [disabled]="loading">Refresh</button>
     </div>
-  </div>
 
-  <div *ngIf="!loading && detail" class="row g-3">
-    <div class="col-12">
-      <div class="card border-0 shadow-sm detail-card">
-        <div class="card-body p-3 p-md-4">
-          <p class="case-id mb-1">{{ detail?.crNoRef || detail?.id || '-' }}</p>
-          <h1 class="h3 mb-2">{{ detail?.title || 'Untitled Case' }}</h1>
-          <p class="text-muted mb-3">{{ detail?.projectName || detail?.projectId || '-' }}</p>
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</div>
 
-          <div class="row g-3 mb-3">
-            <div class="col-12 col-md-6 col-lg-4">
-              <p class="meta-label mb-1">Status</p>
-              <p class="meta-value mb-0">{{ detail?.ticketStatusName || detail?.ticketStatusId || '-' }}</p>
+    <div *ngIf="loading" class="card border-0 shadow-sm">
+      <div class="card-body py-4 d-flex align-items-center gap-3">
+        <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+        <span>Memuat detail case...</span>
+      </div>
+    </div>
+
+         <div *ngIf="statusErrorMessage" class="alert alert-danger py-1 px-2 my-2 mb-0" role="alert">{{ statusErrorMessage }}</div>
+              <div *ngIf="statusSuccessMessage" class="alert alert-success py-1 px-2 my-2 mb-0" role="alert">{{ statusSuccessMessage }}</div>
+         
+
+    <div *ngIf="!loading && detail" class="row g-3">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm detail-card">
+          <div class="card-body p-3 p-md-4">
+            <div class="row mb-3">
+              <div class="col-12 col-md-8 ">
+                <p class="case-id mb-1">{{ detail?.crNoRef || detail?.id || '-' }}</p>
+                <h1 class="h3 mb-2">{{ detail?.title || 'Untitled Case' }}</h1>
+                <p class="text-muted mb-3">{{ detail?.projectName || detail?.projectId || '-' }}</p>
+              </div>
+              <div class="col-12 col-md-4 text-md-end">
+                <p class="case-id mb-1"> <label for="selectedStatusId">Update Status</label></p>
+                <div class="d-flex gap-2">
+                 
+                  <select class="form-select form-select-sm"  id="selectedStatusId" name="selectedStatusId"
+                    [(ngModel)]="selectedStatusId" [disabled]="selectedStatusId > 899">
+                    <option *ngFor="let status of statusOptions" [value]="status.id">{{ status.name }}</option>
+
+                  </select>
+                  <ng-container *ngIf="selectedStatusId < 900">
+                    <button  type="button" class="btn btn-sm btn-outline-primary" (click)="submitStatus()"
+                      [disabled]="loading || updatingStatus">{{ updatingStatus ? 'Menyimpan...' : 'Update' }}</button>
+                  </ng-container>
+                </div>
+              </div>
+           
             </div>
-            <div class="col-12 col-md-6 col-lg-4">
-              <p class="meta-label mb-1">Severity</p>
-              <p class="meta-value mb-0">{{ detail?.severityName || detail?.severityId || '-' }}</p>
+
+            <div class="row g-3 mb-3">
+              <div class="col-12 col-md-6 col-lg-4">
+                <p class="meta-label mb-1">Status</p>
+                <p class="meta-value mb-0">{{ detail?.ticketStatusName || detail?.ticketStatusId || '-' }}</p>
+              </div>
+              <div class="col-12 col-md-6 col-lg-4">
+                <p class="meta-label mb-1">Severity</p>
+                <p class="meta-value mb-0">{{ detail?.ticketSeverityName || detail?.ticketSeverityId || '-' }}</p>
+              </div>
+              <div class="col-12 col-md-6 col-lg-4">
+                <p class="meta-label mb-1">Assign To</p>
+                <p class="meta-value mb-0">{{ detail?.assignToName || detail?.assignTo || '-' }}</p>
+              </div>
+              <div class="col-12 col-md-6 col-lg-4">
+                <p class="meta-label mb-1">Submit Date</p>
+                <p class="meta-value mb-0">{{ detail?.submitDate || detail?.inputDate || '-' }}</p>
+              </div>
+              <!-- <div class="col-12 col-md-6 col-lg-4">
+                <p class="meta-label mb-1">Target Completion</p>
+                <p class="meta-value mb-0">{{ detail?.targetCompletionDate || detail?.deadlineDateTime || '-' }}</p>
+              </div> -->
             </div>
-            <div class="col-12 col-md-6 col-lg-4">
-              <p class="meta-label mb-1">Assign To</p>
-              <p class="meta-value mb-0">{{ detail?.assignToName || detail?.assignTo || '-' }}</p>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4">
-              <p class="meta-label mb-1">Submit Date</p>
-              <p class="meta-value mb-0">{{ detail?.submitDate || detail?.inputDate || '-' }}</p>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4">
-              <p class="meta-label mb-1">Target Completion</p>
-              <p class="meta-value mb-0">{{ detail?.targetCompletionDate || detail?.deadlineDateTime || '-' }}</p>
+
+            <div>
+              <p class="meta-label mb-1">Description</p>
+              <div class="alert alert-light">
+                <div class="desc mb-0" [innerHTML]="detail?.description || 'Tidak ada deskripsi.'"></div>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div>
-            <p class="meta-label mb-1">Deskripsi</p>
-            <p class="desc mb-0">{{ detail?.description || 'Tidak ada deskripsi.' }}</p>
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h5 mb-0">Activity Logs</h2>
+              <small class="text-muted" *ngIf="loadingLogs">Memuat logs...</small>
+            </div>
+
+            <div *ngIf="!loadingLogs && !logs.length" class="text-muted">Belum ada activity logs.</div>
+
+            <div class="log-list" *ngIf="logs.length">
+              <div class="log-item" *ngFor="let log of logs">
+                <p class="mb-1 fw-semibold">{{ log?.inputByName || log?.submitByName || log?.submitBy || 'System' }}</p>
+                <p class="mb-1 desc" [innerHTML]="log?.description || '-'"></p>
+                <small class="text-muted">{{ log?.inputDate || log?.submitDate || '-' }}</small>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="col-12">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-3 p-md-4">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h5 mb-0">Activity Logs</h2>
-            <small class="text-muted" *ngIf="loadingLogs">Memuat logs...</small>
-          </div>
-
-          <div *ngIf="!loadingLogs && !logs.length" class="text-muted">Belum ada activity logs.</div>
-
-          <div class="log-list" *ngIf="logs.length">
-            <div class="log-item" *ngFor="let log of logs">
-              <p class="mb-1 fw-semibold">{{ log?.inputByName || log?.submitByName || log?.submitBy || 'System' }}</p>
-              <p class="mb-1 desc">{{ log?.description || '-' }}</p>
-              <small class="text-muted">{{ log?.inputDate || log?.submitDate || '-' }}</small>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+  </section>
 
 </div>

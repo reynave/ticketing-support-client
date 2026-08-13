@@ -1,0 +1,77 @@
+<div class="container">
+
+  <section class="projects-wrap">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+      <div>
+        <p class="label mb-1">Client Projects</p>
+        <h1 class="h3 mb-0">Daftar Project</h1>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm filter-card mb-3">
+      <div class="card-body p-3 p-md-4">
+        <div class="row g-3">
+          <div class="col-12 col-md-6 col-lg-5">
+            <label for="keyword" class="form-label">Cari Nama Project</label>
+            <input id="keyword" type="text" class="form-control" [(ngModel)]="keyword"
+              placeholder="Contoh: PRJ-8DB73818" (keyup.enter)="loadProjects()" />
+          </div>
+
+          <div class="col-12 col-md-4 col-lg-3">
+            <label for="status" class="form-label">Status</label>
+            <select id="status" class="form-select" [(ngModel)]="selectedStatus">
+              <option value="">Semua</option>
+              <option value="1">Active</option>
+              <option value="0">Inactive</option>
+            </select>
+          </div>
+
+          <div class="col-12 col-md-2 col-lg-4 d-flex align-items-end gap-2">
+            <button class="btn btn-primary flex-grow-1" (click)="loadProjects()" [disabled]="loading">Filter</button>
+            <button class="btn btn-light border" (click)="resetFilters()" [disabled]="loading">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+
+    <div *ngIf="loading" class="card border-0 shadow-sm">
+      <div class="card-body py-4 d-flex align-items-center gap-3">
+        <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+        <span>Sedang memuat project...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && !rows.length" class="card border-0 shadow-sm">
+      <div class="card-body py-5 text-center">
+        <h2 class="h5 mb-2">Belum ada data Project</h2>
+        <p class="text-muted mb-0">Silakan ubah filter atau coba refresh data.</p>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && rows.length" class="row g-3">
+      <div class="col-12" *ngFor="let row of rows; trackBy: trackByProject">
+        <article class="card border-0 shadow-sm project-item h-100" (click)="openDetail(row)">
+          <div class="card-body p-2 p-md-3">
+            <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-2">
+              <div>
+                <p class="project-id mb-1">{{ row?.id || '-' }}</p>
+                <h3 class="h5 mb-1">{{ row?.name || 'Untitled Project' }}</h3>
+                <p class="text-muted mb-0">{{ row?.projectTypeName || '-' }}</p>
+              </div>
+              <span class="badge text-bg-light border">{{ row?.status === 1 ? 'Active' : 'Inactive' }}</span>
+            </div>
+            <div class="meta d-flex flex-wrap gap-3">
+              <span><strong>Start :</strong> {{ row?.startDate || '-' }}</span>
+              |
+              <span><strong>End :</strong> {{ row?.endDate || '-' }}</span>
+              |
+              <span><strong>Billable :</strong> {{ row?.projectBilleableName || '-' }}</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</div>

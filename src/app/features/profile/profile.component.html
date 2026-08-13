@@ -1,0 +1,97 @@
+<div class="container">
+
+  <section class="profile-wrap">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+      <div>
+        <p class="label mb-1">Client Profile</p>
+        <h1 class="h3 mb-0">My Profile</h1>
+      </div>
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success" role="alert">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+
+    <div *ngIf="loading" class="card border-0 shadow-sm">
+      <div class="card-body py-4 d-flex align-items-center gap-3">
+        <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+        <span>Loading profile...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!loading" class="card border-0 shadow-sm profile-card">
+      <div class="card-body p-3 p-md-4">
+        <form #profileForm="ngForm" (ngSubmit)="onSubmit(profileForm)" novalidate>
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="firstName">First Name <span class="text-danger">*</span></label>
+              <input id="firstName" name="firstName" class="form-control" [(ngModel)]="formModel.firstName" required maxlength="200" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="lastName">Last Name</label>
+              <input id="lastName" name="lastName" class="form-control" [(ngModel)]="formModel.lastName" maxlength="200" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="email">Email <span class="text-danger">*</span></label>
+              <input id="email" name="email" type="email" class="form-control" [(ngModel)]="formModel.email" required email #emailModel="ngModel" />
+              <div *ngIf="emailModel.invalid && (emailModel.dirty || emailModel.touched)" class="invalid-text mt-1">
+                Email is required and must be in a valid format.
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="birthday">Birthday</label>
+              <input id="birthday" name="birthday" type="date" class="form-control" [(ngModel)]="formModel.birthday" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="phone">Phone</label>
+              <input id="phone" name="phone" class="form-control" [(ngModel)]="formModel.phone" maxlength="20" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="mobile">Mobile</label>
+              <input id="mobile" name="mobile" class="form-control" [(ngModel)]="formModel.mobile" maxlength="20" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="division">Division</label>
+              <input id="division" name="division" class="form-control" [(ngModel)]="formModel.division" maxlength="250" />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="position">Position</label>
+              <input id="position" name="position" class="form-control" [(ngModel)]="formModel.position" maxlength="250" />
+            </div>
+
+            <div class="col-12">
+              <hr />
+              <p class="meta-label mb-2">Change Password (optional)</p>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="password">New Password</label>
+              <input id="password" name="password" type="password" class="form-control" [(ngModel)]="formModel.password" minlength="6" #passwordModel="ngModel" placeholder="Leave blank if you do not want to change" />
+              <div *ngIf="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)" class="invalid-text mt-1">
+                Password minimal 6 karakter.
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="confirmPassword">Confirm Password</label>
+              <input id="confirmPassword" name="confirmPassword" type="password" class="form-control" [(ngModel)]="formModel.confirmPassword" placeholder="Repeat new password" />
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end mt-4">
+            <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || saving">
+              <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+              {{ saving ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>

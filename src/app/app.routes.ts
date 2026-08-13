@@ -4,6 +4,9 @@ import { loginGuard } from './core/guards/login.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { CaseDetailComponent } from './features/cases/cases-detail/case-detail.component';
 import { CaseListComponent } from './features/cases/case-list.component';
+import { ProjectDetailComponent } from './features/projects/project-detail/project-detail.component';
+import { ProjectListComponent } from './features/projects/project-list.component';
+import { ProfileComponent } from './features/profile/profile.component';
 import { ClientLayoutComponent } from './layout/client-layout.component';
 
 export const routes: Routes = [
@@ -30,6 +33,21 @@ export const routes: Routes = [
 				path: 'cases/:id',
 				component: CaseDetailComponent,
 			},
+			{
+				path: 'projects',
+				component: ProjectListComponent,
+			},
+			{
+				path: 'projects/:id',
+				component: ProjectDetailComponent,
+			},
+			{
+				path: 'profile',
+				component: ProfileComponent,
+			},
+
+			// Add more routes here as needed
+
 		],
 	},
 	{

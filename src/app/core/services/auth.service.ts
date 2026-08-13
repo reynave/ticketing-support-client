@@ -59,7 +59,7 @@ export class AuthService {
   }
 
   login(payload: LoginForm): Observable<any> {
-    return this.http.post<any>(`${environment.apiBaseUrl}/auth/login`, payload).pipe(
+    return this.http.post<any>(`${environment.apiBaseUrl}/client-auth/login`, payload).pipe(
       tap((response) => {
         const token = response?.data?.token;
         const user = response?.data?.user || null;
@@ -79,7 +79,7 @@ export class AuthService {
   }
 
   fetchMe(): Observable<any> {
-    return this.http.get<any>(`${environment.apiBaseUrl}/auth/me`).pipe(
+    return this.http.get<any>(`${environment.apiBaseUrl}/client-auth/me`).pipe(
       tap((response) => {
         const user = response?.data || null;
 

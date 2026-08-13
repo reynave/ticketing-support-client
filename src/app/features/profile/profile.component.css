@@ -1,0 +1,33 @@
+:host {
+  display: block;
+}
+
+.profile-wrap {
+  font-family: 'Sora', sans-serif;
+}
+
+.label {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0c6f63;
+  font-weight: 700;
+}
+
+.profile-card {
+  border-radius: 16px;
+  border-left: 5px solid #0f7a68 !important;
+}
+
+.meta-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6d8783;
+  font-weight: 700;
+}
+
+.invalid-text {
+  color: #c13d2b;
+  font-size: 0.8rem;
+}
