@@ -16,6 +16,16 @@ export class ClientLayoutComponent {
 
   user$ = this.authService.currentUser$;
 
+  isMenuOpen = false;
+
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu(): void {
+    this.isMenuOpen = false;
+  }
+
   logout(): void {
     this.authService.logout(false);
     void this.router.navigateByUrl('/login');

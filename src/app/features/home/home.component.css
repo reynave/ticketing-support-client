@@ -1,0 +1,129 @@
+.chart-holder {
+  position: relative;
+  height: 360px;
+  width: 100%;
+}
+
+.stat-card {
+  border-radius: 0.75rem;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1f1f1f;
+}
+
+.stat-subtitle {
+  font-size: 0.75rem;
+  color: #9a9a9a;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.stat-icon {
+  flex: 0 0 auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #f5f5f7;
+  color: #6b6b6b;
+  font-size: 1rem;
+}
+
+.view-all-link {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b6b6b;
+  text-decoration: none;
+}
+
+.view-all-link:hover {
+  color: #111;
+}
+
+.recent-tickets-card {
+  overflow: hidden;
+}
+
+.ticket-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  border-left: 4px solid transparent;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.15s ease;
+}
+
+.ticket-item:last-child {
+  border-bottom: none;
+}
+
+.ticket-item:hover {
+  background-color: #fafafa;
+}
+
+.ticket-date {
+  flex: 0 0 90px;
+  font-size: 0.8rem;
+  color: #8a8a8a;
+  white-space: nowrap;
+}
+
+.ticket-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ticket-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f1f1f;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticket-subtitle {
+  font-size: 0.8rem;
+  color: #9a9a9a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticket-status {
+  flex: 0 0 auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* Status accent colors: left stripe + matching badge */
+.status-blue { border-left-color: #4c8dff; }
+.status-blue .ticket-status { background-color: #e8f0ff; color: #2f6fed; }
+
+.status-purple { border-left-color: #9b6bff; }
+.status-purple .ticket-status { background-color: #efe7ff; color: #7a4de0; }
+
+.status-green { border-left-color: #34c77b; }
+.status-green .ticket-status { background-color: #e4f8ec; color: #1f9d5c; }
+
+.status-orange { border-left-color: #ff9f43; }
+.status-orange .ticket-status { background-color: #fff1e0; color: #d9791a; }
+
+.status-red { border-left-color: #ff6b6b; }
+.status-red .ticket-status { background-color: #ffe9e9; color: #e34d4d; }
+
+.status-gray { border-left-color: #c5c5c5; }
+.status-gray .ticket-status { background-color: #f0f0f0; color: #6b6b6b; }

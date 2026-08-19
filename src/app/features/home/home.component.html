@@ -1,0 +1,66 @@
+<div class="container">
+    <section class="home-wrap">
+        <div class="mb-4">
+            <p class="label mb-1">Overview</p>
+            <h1 class="h3 mb-0">Dashboard</h1>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-lg-3" *ngFor="let stat of statCards">
+                <div class="card border-0 shadow-sm stat-card h-100">
+                    <div class="card-body p-3 d-flex justify-content-between align-items-start">
+                        <div>
+                            <div style="min-height: 40px;">
+                                <p class="stat-label mb-1">{{ stat.label }}</p>
+                            </div>
+                            <p class="stat-subtitle mb-2">{{ stat.subtitle }}</p>
+                            <p class="stat-value mb-0">{{ stat.value | number }}</p>
+                        </div>
+                        <span class="stat-icon"><i class="bi" [ngClass]="stat.icon"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-lg-6">
+                 <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-3">
+                    <h2 class="h5 mb-0">Dashboard Tickets</h2>
+                    
+                </div>
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="chart-holder">
+                            <canvas baseChart [data]="barChartData" [options]="barChartOptions" type="bar"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6">
+
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-3">
+                    <h2 class="h5 mb-0">Recent Tickets</h2>
+                    <a href="javascript:void(0)" class="view-all-link">View all <span aria-hidden="true">↗</span></a>
+                </div>
+
+                <div class="card border-0 shadow-sm recent-tickets-card">
+                    <ul class="list-unstyled mb-0">
+                        <li class="ticket-item status-{{ statusColor(row.ticketStatusName) }}"
+                            *ngFor="let row of recentTickets">
+                            <div class="ticket-date">{{ row.submitDate }}</div>
+                            <div class="ticket-body">
+                                <p class="ticket-title mb-0">{{ row.title }}</p>
+                                <p class="ticket-subtitle mb-0">{{ row.projectName }} &middot; {{ row.assignToName }}
+                                </p>
+                            </div>
+                            <span class="ticket-status">{{ row.ticketStatusName }}</span>
+                        </li>
+                        <li *ngIf="!recentTickets.length" class="text-center text-muted py-4">No data available</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+    </section>
+</div>

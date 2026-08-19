@@ -1,24 +1,39 @@
 <div class="client-shell">
   <nav class="navbar navbar-expand-lg topbar sticky-top">
     <div class="container-fluid px-3 px-md-4 nav-wrap">
-      <a class="navbar-brand" routerLink="/cases">Thinktank Client</a>
+      <a class="navbar-brand" routerLink="/home" (click)="closeMenu()">
+        <div>Thinktank's Client</div>
+        <small>build 260312.2034</small>
+      </a>
 
-      <ul class="navbar-nav nav-tabs-client">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/cases" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-            Cases
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/projects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-            Projects
-          </a>
-        </li>
-      </ul>
+      <button type="button" class="navbar-toggler" aria-label="Toggle navigation"
+        [attr.aria-expanded]="isMenuOpen" (click)="toggleMenu()">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-      <div class="d-flex align-items-center gap-3 user-actions">
-        <a class="user-pill" routerLink="/profile" *ngIf="(user$ | async) as user">{{ user?.name || user?.email || 'Client User' }}</a>
-        <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
+      <div class="nav-collapse" [class.show]="isMenuOpen">
+        <ul class="navbar-nav nav-tabs-client">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+              Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/cases" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+              Cases
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/projects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+              Projects
+            </a>
+          </li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-3 user-actions">
+          <a class="user-pill" routerLink="/profile" *ngIf="(user$ | async) as user" (click)="closeMenu()">{{ user?.name || user?.email || 'Client User' }}</a>
+          <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
+        </div>
       </div>
     </div>
   </nav>
