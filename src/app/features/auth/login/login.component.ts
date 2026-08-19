@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.authService.isAuthenticated) {
-      void this.router.navigateByUrl('/cases');
+      void this.router.navigateByUrl('/home');
     }
   }
 
@@ -51,7 +51,7 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: () => {
           this.loading = false;
-          void this.router.navigateByUrl('/cases');
+          void this.router.navigateByUrl('/home');
         },
         error: (error) => {
           this.loading = false;

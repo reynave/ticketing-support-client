@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import { buildInfo } from '../../environments/build-info';
 
 @Component({
   selector: 'app-client-layout',
@@ -15,7 +16,7 @@ export class ClientLayoutComponent {
   private readonly router = inject(Router);
 
   user$ = this.authService.currentUser$;
-
+  buildTime: string = buildInfo.buildCode; // auto-generated on each build
   isMenuOpen = false;
 
   toggleMenu(): void {
