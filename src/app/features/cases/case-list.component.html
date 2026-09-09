@@ -102,7 +102,7 @@
                      placeholder="Jelaskan detail issue atau request"></textarea>
                </div>
 
-               <div class="col-12 col-md-4">
+               <div class="col-12 col-lg-4">
                   <label class="form-label" for="projectId">Project  <span class="text-danger">*</span></label>
                   <select id="projectId" name="projectId" class="form-select" [(ngModel)]="formModel.projectId"
                      (change)="onProjectChanged()" required>
@@ -126,7 +126,7 @@
                
  
  
-               <div class="col-12 col-md-4">
+               <div class="col-12 col-lg-4">
                   <label class="form-label" for="ticketCategoryId">Category  <span class="text-danger">*</span></label>
                   <select id="ticketCategoryId" name="ticketCategoryId" class="form-select"
                      [(ngModel)]="formModel.ticketCategoryId">
@@ -136,7 +136,7 @@
                   </select>
                </div>
 
-               <div class="col-12 col-md-4">
+               <div class="col-12 col-lg-4">
                   <label class="form-label" for="productChildId">Module  <span class="text-danger">*</span></label>
                   <select id="productChildId" name="productChildId" class="form-select"
                      [(ngModel)]="formModel.productChildId" [disabled]="!formModel.projectId" required>
@@ -145,13 +145,18 @@
                   </select>
                </div>
 
-               <div class="col-12 col-md-4">
+               <div class="col-12 col-lg-4">
                   <label class="form-label" for="severityId">Severity  <span class="text-danger">*</span></label>
                   <select id="severityId" name="severityId" class="form-select" [(ngModel)]="formModel.severityId">
                      <option value="" *ngIf="!formModel.severityId">Select severity</option>
                      <option *ngFor="let severity of ticketSeverities" [value]="severity.id">{{ severity.name }}
                      </option>
                   </select>
+               </div>
+
+
+               <div class="alert alert-danger" *ngIf="balanceWarning">
+                  {{ balanceWarning }}
                </div>
  
             </div>
@@ -160,7 +165,7 @@
         <div class="modal-footer">
             <button type="button" class="btn btn-light border" (click)="closeCreateModal()"
                [disabled]="saving">Cancel</button>
-            <button type="submit" class="btn btn-primary" [disabled]="saving || createForm.invalid">
+            <button type="submit" class="btn btn-primary" [disabled]="saving || createForm.invalid || clientBalance <= 0">
                <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
                {{ saving ? 'Save...' : 'Create Case' }}
             </button>

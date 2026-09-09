@@ -118,8 +118,36 @@ export class CaseListComponent implements OnInit {
 
     this.modalRef?.dismiss();
   }
-
+  ticketBased = false;
+  clientBalance: number  =0;
+  balanceWarning : string = '';
   onProjectChanged(): void {
+    console.log('projectId', this.formModel.projectId);
+
+
+    // cari project index berdasarkan this.formModel.projectId dari array this.projects
+    const projectIndex = this.projects.findIndex(
+      (project) => String(project?.id) === String(this.formModel.projectId)
+    );  
+
+     if( this.projects[projectIndex].ticketBased == 1) {
+ 
+    this.apiService.get('/client-ticket/balance/client/' + this.formModel.projectId).subscribe({
+      next: (response) => {
+        console.log('project details', response.data);
+        this.clientBalance = response.data?.balance || 0;
+        this.balanceWarning = response.data?.note || '';
+
+      },
+      error: (error) => {
+        console.error('Failed to load project details', error);
+      },
+    });
+  } else{
+    this.clientBalance = 1000;
+    this.balanceWarning = '';
+  }
+
     const selectedProject = this.projects.find(
       (project) => String(project?.id) === String(this.formModel.projectId),
     );
@@ -151,7 +179,7 @@ export class CaseListComponent implements OnInit {
     this.formModel.ticketCategoryId = '';
     this.formModel.assignTo = '';
   }
-addHour : number = 0;
+  addHour: number = 0;
   submitCreate(form: NgForm): void {
     if (form.invalid || this.saving) {
       return;
@@ -181,7 +209,8 @@ addHour : number = 0;
         const users = response?.data.users || null;
 
         // cari asManager = 1
-        let asManager = users?.find((user: any) => user?.asManager === 1) || null;
+        let asManager =
+          users?.find((user: any) => user?.asManager === 1) || null;
         console.log('users', users);
 
         if (!asManager) {
@@ -189,24 +218,23 @@ addHour : number = 0;
         }
         console.log('asManager', asManager.id);
 
+        const today = new Date();
 
-       const today = new Date();
+        // saya mau hhiiss ditambah 3 jam
 
-    // saya mau hhiiss ditambah 3 jam
+        this.addHour =
+          this.ticketSeverities.find(
+            (severity: any) =>
+              String(severity?.id) === String(this.formModel.severityId),
+          )?.addHour || 0;
 
-        this.addHour = this.ticketSeverities.find((severity: any) => String(severity?.id) === String(this.formModel.severityId))?.addHour || 0;
-
-    const addHour = this.addHour;
-    const threeHoursLater = new Date(
-      today.getTime() + addHour * 60 * 60 * 1000,
-    );
-    const hhiissPlus = threeHoursLater.toTimeString().split(' ')[0];
-    const deadlineDateTime =
-      `${this.formModel.submitDate}` +
-      ' ' +
-      hhiissPlus;
-
-
+        const addHour = this.addHour;
+        const threeHoursLater = new Date(
+          today.getTime() + addHour * 60 * 60 * 1000,
+        );
+        const hhiissPlus = threeHoursLater.toTimeString().split(' ')[0];
+        const deadlineDateTime =
+          `${this.formModel.submitDate}` + ' ' + hhiissPlus;
 
         const payload: any = {
           title: this.formModel.title.trim(),
@@ -226,8 +254,7 @@ addHour : number = 0;
           productChildId: this.formModel.productChildId
             ? Number(this.formModel.productChildId)
             : null,
-          assignTo: asManager.id ,
-          
+          assignTo: asManager.id,
         };
 
         this.apiService.post('/cases', payload).subscribe({
@@ -268,6 +295,7 @@ addHour : number = 0;
 
   private loadOptions(): void {
     this.loadingOptions = true;
+     
 
     this.apiService.get('/project', { status: 1 }).subscribe({
       next: (projectResponse) => {

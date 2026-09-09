@@ -1,15 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
+import { forkJoin } from 'rxjs';
+import { ApiService } from '../../core/services/api.service';
 
-// Sample response shape expected from REST API later, e.g. GET /dashboard/cases-summary
-interface DashboardSummaryResponse {
-  labels: string[];
-  datasets: {
-    label: string;
-    data: number[];
-  }[];
+// Row shape returned by GET /client-ticket/cases and GET /client-ticket/change-requests
+interface TicketRow {
+  id: string;
+  projectId: string;
+  title: string;
+  submitDate: string;
+  targetCompletionDate: string;
+  ticketStatusId: number;
+  ticketStatusName: string;
+  assignTo: string;
+  assignToName: string;
+  projectName: string;
 }
 
 interface RecentTicketRow {
@@ -28,6 +35,10 @@ interface StatCard {
   icon: string;
 }
 
+const OPEN_STATUS_THRESHOLD = 900;
+const RECENT_TICKETS_LIMIT = 6;
+const CHART_MONTHS = 6;
+
 // Maps status name to an accent color used by the recent-tickets list stripe/badge
 const STATUS_COLOR_MAP: Record<string, string> = {
   Open: 'blue',
@@ -45,25 +56,18 @@ const STATUS_COLOR_MAP: Record<string, string> = {
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
-export class HomeComponent {
-  // Sample stat cards, to be replaced by data from the REST API, e.g. GET /dashboard/stats
+export class HomeComponent implements OnInit {
+  private readonly apiService = inject(ApiService);
+
+  loading = false;
+  errorMessage = '';
+
   statCards: StatCard[] = [
-    { label: 'All Cases', subtitle: 'All tickets', value: 2300, icon: 'bi-people' },
-    { label: 'Waiting To be Reviewed by Client', subtitle: 'Client replies', value: 112, icon: 'bi-chat-dots' },
-
-    { label: 'Case on Progress', subtitle: 'Tickets without reply', value: 1678, icon: 'bi-arrow-repeat' },
-    { label: 'Closed Cases', subtitle: 'Staff replies', value: 1678, icon: 'bi-check2-square' },
+    { label: 'All Cases', subtitle: 'All tickets', value: 0, icon: 'bi-people' },
+    { label: 'All Change Requests', subtitle: 'All CR tickets', value: 0, icon: 'bi-chat-dots' },
+    { label: 'Case on Progress', subtitle: 'Not yet closed', value: 0, icon: 'bi-arrow-repeat' },
+    { label: 'Closed Cases', subtitle: 'Completed tickets', value: 0, icon: 'bi-check2-square' },
   ];
-
-  // Sample JSON, to be replaced by data from the REST API
-  private readonly dashboardSummarySample: DashboardSummaryResponse = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      { label: 'Open', data: [12, 19, 8, 15, 10, 14] },
-      { label: 'In Progress', data: [7, 11, 9, 6, 12, 8] },
-      { label: 'Closed', data: [20, 15, 22, 18, 25, 21] },
-    ],
-  };
 
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
@@ -79,64 +83,112 @@ export class HomeComponent {
   };
 
   public barChartData: ChartData<'bar'> = {
-    labels: this.dashboardSummarySample.labels,
-    datasets: this.dashboardSummarySample.datasets.map((dataset) => ({
-      label: dataset.label,
-      data: dataset.data,
-    })),
+    labels: [],
+    datasets: [
+      { label: 'Open', data: [] },
+      { label: 'Closed', data: [] },
+    ],
   };
 
-  // Sample list data, to be replaced by data from the REST API
-  recentTickets: RecentTicketRow[] = [
-    {
-      crNoRef: 'CASE-2026-001',
-      title: 'Login page error on mobile',
-      projectName: 'Ticketing Portal',
-      ticketStatusName: 'Overdue',
-      assignToName: 'Waiting',
-      submitDate: '2026-08-01',
-    },
-    {
-      crNoRef: 'CASE-2026-002',
-      title: 'Export report failed',
-      projectName: 'Reporting System',
-      ticketStatusName: 'Open',
-      assignToName: 'John Doe',
-      submitDate: '2026-08-05',
-    },
-    {
-      crNoRef: 'CASE-2026-003',
-      title: 'Add new user role',
-      projectName: 'Ticketing Portal',
-      ticketStatusName: 'Completed',
-      assignToName: 'Jane Smith',
-      submitDate: '2026-08-10',
-    },
-    {
-      crNoRef: 'CASE-2026-004',
-      title: 'Any mechanical keyboard enthusiast question',
-      projectName: 'Support',
-      ticketStatusName: 'Pending',
-      assignToName: 'Waiting',
-      submitDate: '2026-08-11',
-    },
-    {
-      crNoRef: 'CASE-2026-005',
-      title: 'Understanding color theory: the color wheel',
-      projectName: 'Design',
-      ticketStatusName: 'Open',
-      assignToName: 'John Doe',
-      submitDate: '2026-08-12',
-    },
-    {
-      crNoRef: 'CASE-2026-006',
-      title: 'How to design a product that can grow',
-      projectName: 'Product',
-      ticketStatusName: 'Overdue',
-      assignToName: 'Jane Smith',
-      submitDate: '2026-08-13',
-    },
-  ];
+  recentTickets: RecentTicketRow[] = [];
+
+  ngOnInit(): void {
+    this.loadDashboard();
+  }
+
+  loadDashboard(): void {
+    this.loading = true;
+    this.errorMessage = '';
+
+    forkJoin({
+      cases: this.apiService.get('/client-ticket/cases'),
+      changeRequests: this.apiService.get('/client-ticket/change-requests'),
+    }).subscribe({
+      next: ({ cases, changeRequests }) => {
+        this.loading = false;
+        const caseRows: TicketRow[] = Array.isArray(cases?.data) ? cases.data : [];
+        const crRows: TicketRow[] = Array.isArray(changeRequests?.data) ? changeRequests.data : [];
+
+        this.updateStatCards(caseRows, crRows);
+        this.updateChart(caseRows);
+        this.updateRecentTickets(caseRows, crRows);
+      },
+      error: (error) => {
+        this.loading = false;
+        this.errorMessage = error?.error?.message || 'Gagal memuat data dashboard.';
+      },
+    });
+  }
+
+  private updateStatCards(caseRows: TicketRow[], crRows: TicketRow[]): void {
+    const openCases = caseRows.filter((row) => row.ticketStatusId < OPEN_STATUS_THRESHOLD).length;
+    const closedCases = caseRows.length - openCases;
+
+    this.statCards = [
+      { label: 'All Cases', subtitle: 'All tickets', value: caseRows.length, icon: 'bi-people' },
+      { label: 'All Change Requests', subtitle: 'All CR tickets', value: crRows.length, icon: 'bi-chat-dots' },
+      { label: 'Case on Progress', subtitle: 'Not yet closed', value: openCases, icon: 'bi-arrow-repeat' },
+      { label: 'Closed Cases', subtitle: 'Completed tickets', value: closedCases, icon: 'bi-check2-square' },
+    ];
+  }
+
+  private updateChart(caseRows: TicketRow[]): void {
+    const now = new Date();
+    const months: { key: string; label: string }[] = [];
+
+    for (let i = CHART_MONTHS - 1; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push({
+        key: `${date.getFullYear()}-${date.getMonth()}`,
+        label: date.toLocaleString('default', { month: 'short' }),
+      });
+    }
+
+    const openCounts = months.map(() => 0);
+    const closedCounts = months.map(() => 0);
+
+    caseRows.forEach((row) => {
+      const submitDate = new Date(row.submitDate);
+      if (Number.isNaN(submitDate.getTime())) {
+        return;
+      }
+
+      const monthKey = `${submitDate.getFullYear()}-${submitDate.getMonth()}`;
+      const monthIndex = months.findIndex((month) => month.key === monthKey);
+
+      if (monthIndex === -1) {
+        return;
+      }
+
+      if (row.ticketStatusId < OPEN_STATUS_THRESHOLD) {
+        openCounts[monthIndex]++;
+      } else {
+        closedCounts[monthIndex]++;
+      }
+    });
+
+    this.barChartData = {
+      labels: months.map((month) => month.label),
+      datasets: [
+        { label: 'Open', data: openCounts },
+        { label: 'Closed', data: closedCounts },
+      ],
+    };
+  }
+
+  private updateRecentTickets(caseRows: TicketRow[], crRows: TicketRow[]): void {
+    this.recentTickets = [...caseRows, ...crRows]
+      .sort((a, b) => new Date(b.submitDate).getTime() - new Date(a.submitDate).getTime())
+      .slice(0, RECENT_TICKETS_LIMIT)
+      .map((row) => ({
+        crNoRef: row.id,
+        title: row.title,
+        projectName: row.projectName,
+        ticketStatusName: row.ticketStatusName,
+        assignToName: row.assignToName,
+        submitDate: row.submitDate,
+      }));
+  }
 
   statusColor(status: string): string {
     return STATUS_COLOR_MAP[status] || 'gray';
