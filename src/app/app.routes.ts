@@ -9,6 +9,7 @@ import { ProjectDetailComponent } from './features/projects/project-detail/proje
 import { ProjectListComponent } from './features/projects/project-list.component';
 import { ProfileComponent } from './features/profile/profile.component';
 import { ClientLayoutComponent } from './layout/client-layout.component';
+import { RateComponent } from './features/rate/rate.component';
 
 export const routes: Routes = [
 	{
@@ -37,6 +38,10 @@ export const routes: Routes = [
 			{
 				path: 'cases/:id',
 				component: CaseDetailComponent,
+			},
+			{
+				path: 'cases/:id/rate',
+				component: RateComponent,
 			},
 			{
 				path: 'projects',

@@ -36,6 +36,7 @@ export class CaseListComponent implements OnInit {
   private modalRef: any = null;
 
   rows: any[] = [];
+  closedRows: any[] = [];
   loading = false;
   errorMessage = '';
   successMessage = '';
@@ -58,6 +59,8 @@ export class CaseListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCases();
+   
+    
     this.loadOptions();
   }
 
@@ -79,6 +82,7 @@ export class CaseListComponent implements OnInit {
       next: (response) => {
         this.loading = false;
         this.rows = Array.isArray(response?.data) ? response.data : [];
+         this.loadCasesClosed();
       },
       error: (error) => {
         this.loading = false;
@@ -88,11 +92,41 @@ export class CaseListComponent implements OnInit {
       },
     });
   }
+  loadCasesClosed(): void {
+    this.loading = true;
+    this.errorMessage = '';
 
+    const query: any = {};
+
+    if (this.keyword.trim()) {
+      query.keyword = this.keyword.trim();
+    }
+
+    if (this.selectedStatus !== '') {
+      query.ticketStatusId = this.selectedStatus;
+    }
+
+    this.apiService.get('/cases/closed', query).subscribe({
+      next: (response) => {
+        this.loading = false;
+        this.closedRows = Array.isArray(response?.data) ? response.data : [];
+
+        //saya mau gambungakn array this.row dengan this.closedRows
+        this.rows = [...this.rows, ...this.closedRows]; 
+      },
+      error: (error) => {
+        this.loading = false;
+        this.closedRows = [];
+        this.errorMessage =
+          error?.error?.message || 'Gagal memuat daftar cases.';
+      },
+    });
+  }
   resetFilters(): void {
     this.keyword = '';
     this.selectedStatus = '';
     this.loadCases();
+    this.loadCasesClosed();
   }
 
   openCreateModal(content: any): void {

@@ -1,23 +1,72 @@
 <div class="container">
-
+  
   <section class="case-detail-wrap">
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
-      <button type="button" class="btn btn-outline-secondary" (click)="goBack()">Back</button>
-      <button type="button" class="btn btn-outline-primary" (click)="loadDetail()" [disabled]="loading">Refresh</button>
+    <div class="row  mb-3 g-2">
+      <div class="col-3 col-md-2">
+        <button type="button" class="btn btn-outline-secondary" (click)="goBack()">Back</button>
+
+      </div>
+      @if(detail?.ticketStatusId >= 400  && detail?.ticketStatusId < 500){ 
+      <div class="col-12 col-md-8">
+    
+        <div class="d-flex gap-2">
+          <label for="selectedStatusId" class="align-content-center"> Status</label>
+          <select class="form-select" id="selectedStatusId" name="selectedStatusId" [(ngModel)]="selectedStatusId"
+            [disabled]="detail.clientEditable == 0">
+            <option *ngFor="let status of statusOptions" [value]="status.id">{{ status.name }}</option>
+
+          </select>
+
+        </div>
+      </div>
+      <div class="col-12 col-md-2 d-grid">
+        <ng-container *ngIf="detail.clientEditable != 0">
+          <button type="button" class="btn btn-primary" (click)="submitStatus()"
+            [disabled]="loading || updatingStatus">{{ updatingStatus ? 'Menyimpan...' : 'Update' }}</button>
+        </ng-container>
+      </div>
+    }
+    @else{
+      <div class="col-md-8  col-3 text-end align-content-center">
+          <strong>Ticket Status : </strong>
+      </div>
+      <div class="col-md-2 col-6">
+        
+        <div class="form-control bg-light">
+          {{ detail?.ticketStatusName || detail?.ticketStatusId || '-' }}
+        </div>
+          
+      </div>
+    }
+
+
     </div>
 
-    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+    <div *ngIf="errorMessage" class="alert alert-danger my-3" role="alert">{{ errorMessage }}</div>
 
     <div *ngIf="loading" class="card border-0 shadow-sm">
-      <div class="card-body py-4 d-flex align-items-center gap-3">
+      <div class="card-body py-4 d-flex align-items-center gap-3 my-3">
         <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
         <span>Memuat detail case...</span>
       </div>
     </div>
 
-         <div *ngIf="statusErrorMessage" class="alert alert-danger py-1 px-2 my-2 mb-0" role="alert">{{ statusErrorMessage }}</div>
-              <div *ngIf="statusSuccessMessage" class="alert alert-success py-1 px-2 my-2 mb-0" role="alert">{{ statusSuccessMessage }}</div>
-         
+    <div *ngIf="statusErrorMessage" class="alert alert-danger py-1 px-2 my-2 my-3" role="alert">{{ statusErrorMessage }}
+    </div>
+    <div *ngIf="statusSuccessMessage" class="alert alert-success py-1 px-2 my-2 my-3" role="alert">{{
+      statusSuccessMessage }}</div>
+
+
+      @if(detail?.ratesBy == '' && detail?.ticketStatusId >= 900){
+        <div class="alert alert-warning text-center">
+          <p>Please provide a rating for this case. <br>Your rating is important for us to improve our service.</p>
+          
+            <a  [routerLink]="['/cases/', detail?.id, 'rate']" class="btn btn-warning">Rating Now</a>
+     
+        </div>
+      }
+     
+
 
     <div *ngIf="!loading && detail" class="row g-3">
       <div class="col-12">
@@ -30,39 +79,29 @@
                 <p class="text-muted mb-3">{{ detail?.projectName || detail?.projectId || '-' }}</p>
               </div>
               <div class="col-12 col-md-4 text-md-end">
-                <p class="case-id mb-1"> <label for="selectedStatusId">Update Status</label></p>
-                <div class="d-flex gap-2">
-                 
-                  <select class="form-select form-select-sm"  id="selectedStatusId" name="selectedStatusId"
-                    [(ngModel)]="selectedStatusId" [disabled]="selectedStatusId > 899">
-                    <option *ngFor="let status of statusOptions" [value]="status.id">{{ status.name }}</option>
-
-                  </select>
-                  <ng-container *ngIf="selectedStatusId < 900">
-                    <button  type="button" class="btn btn-sm btn-outline-primary" (click)="submitStatus()"
-                      [disabled]="loading || updatingStatus">{{ updatingStatus ? 'Menyimpan...' : 'Update' }}</button>
-                  </ng-container>
-                </div>
+               <p class="meta-label mb-1">Submit Date</p>
+                <p class="meta-value mb-0">{{ detail?.submitDate || detail?.inputDate || '-' }}</p>
               </div>
-           
+
             </div>
 
             <div class="row g-3 mb-3">
-              <div class="col-12 col-md-6 col-lg-4">
+              <div class="col-12 col-md-6 col-lg-3">
                 <p class="meta-label mb-1">Status</p>
                 <p class="meta-value mb-0">{{ detail?.ticketStatusName || detail?.ticketStatusId || '-' }}</p>
               </div>
-              <div class="col-12 col-md-6 col-lg-4">
+              <div class="col-12 col-md-6 col-lg-3">
                 <p class="meta-label mb-1">Severity</p>
                 <p class="meta-value mb-0">{{ detail?.ticketSeverityName || detail?.ticketSeverityId || '-' }}</p>
               </div>
-              <div class="col-12 col-md-6 col-lg-4">
+              <div class="col-12 col-md-6 col-lg-3">
                 <p class="meta-label mb-1">Assign To</p>
                 <p class="meta-value mb-0">{{ detail?.assignToName || detail?.assignTo || '-' }}</p>
               </div>
-              <div class="col-12 col-md-6 col-lg-4">
-                <p class="meta-label mb-1">Submit Date</p>
-                <p class="meta-value mb-0">{{ detail?.submitDate || detail?.inputDate || '-' }}</p>
+              <div class="col-12 col-md-6 col-lg-3">
+                <p class="meta-label mb-1">Estimation</p>
+                <p class="meta-value mb-0">
+                  {{ detail?.ticketBased != 0  ? detail?.ticketEstimationCost + ' Tickets or'  || '' : '' }}  {{ detail?.hours || '0' }} Hours</p>
               </div>
               <!-- <div class="col-12 col-md-6 col-lg-4">
                 <p class="meta-label mb-1">Target Completion</p>

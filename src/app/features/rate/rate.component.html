@@ -1,0 +1,43 @@
+<div class="container">
+    <div class="row g-1">
+        <div class="col-1">
+            <button type="button" class="btn btn-outline-secondary" (click)="goBack()">Back</button>
+
+        </div>
+        <div class="col-11">
+            <h2>Rate the Questions</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="bg-white p-3 rounded-2 shadow-sm border">
+ 
+                <table class="table  table-hover ">
+                    <tbody>
+                        <tr *ngFor="let question of ratingQuestions; let i = index">
+                            <td class="align-top pe-2">
+                                <span class="fw-semibold">{{ i + 1 }}.</span>
+                            </td>
+                            <td class="align-top">
+                                <span>{{ question.name }}</span>
+                            </td>
+                            <td>
+                                <ngb-rating [(rate)]="question.value" [max]="5">
+                                    <ng-template let-fill="fill" let-index="index">
+                                        <i class="bi-star{{ fill === 100 ? '-fill' : '' }}"
+                                            [class.filled]="fill === 100" [class.low]="index < 2"></i>
+                                    </ng-template>
+                                </ngb-rating>
+                            </td>
+                            <Td>
+                                <span class="ms-2">{{ question.value || 0 }}</span>
+                            </Td>
+                        </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-12 text-center my-3 d-grid">
+            <button type="button" class="btn btn-lg btn-primary" (click)="goBack()">Submit</button>
+        </div>
+    </div>
+</div>
