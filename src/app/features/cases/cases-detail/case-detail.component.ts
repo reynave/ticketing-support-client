@@ -3,11 +3,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { FormsModule } from '@angular/forms';
+import { NgbRatingModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-case-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule ],
+  imports: [CommonModule, FormsModule, RouterModule, NgbRatingModule ],
   templateUrl: './case-detail.component.html',
   styleUrl: './case-detail.component.css',
 })
@@ -27,7 +28,7 @@ statusOptions : any = [];
   updatingStatus = false;
   statusErrorMessage = '';
   statusSuccessMessage = '';
-
+ 
   ngOnInit(): void {
     this.caseId = String(this.route.snapshot.paramMap.get('id') || '').trim();
 
@@ -35,12 +36,12 @@ statusOptions : any = [];
       void this.router.navigateByUrl('/cases');
       return;
     }
-
+    this.loadMasterDataQuestions(); 
     this.loadDetail();
 
     this.loadLogs();
   }
-
+  
   goBack(): void {
     history.back();
   }
@@ -55,6 +56,7 @@ statusOptions : any = [];
         this.detail = response?.data || null;
         this.selectedStatusId = this.detail?.ticketStatusId || 0;
             this.loadStatusOptions();
+            
       },
       error: (error) => {
         this.loading = false;
@@ -75,6 +77,48 @@ statusOptions : any = [];
         this.statusOptions = [];
       }
     });
+  }
+
+  onSubmitRate(){
+    const payload = this.ratingQuestions.map((question) => ({
+      questionId: question.id,
+      rating: question.value || 0,
+    }));
+
+
+  
+    const data = {
+      rating: payload,
+      ticketId: this.caseId
+    };
+ 
+    console.log('Submitting rating data:', data);
+
+    let rate = 0;
+    let total = 0;
+    for(const question of this.ratingQuestions) {
+      total += 1;
+      rate += question.value || 0;
+    }
+
+    const averageRating = total > 0 ? rate / total : 0;
+
+    console.log(payload, this.caseId, averageRating);
+
+    this.apiService.post('/rating/rate', {
+      ticketId: this.caseId,
+      averageRating: averageRating,
+      ratings: payload, 
+    }).subscribe({
+      next: (response) => { 
+        console.log('Rating submitted successfully:', response);
+        window.location.reload();
+      },
+      error: (error) => {
+        console.error('Failed to submit rating:', error);
+      }
+    });
+     
   }
 
   submitStatus(): void {
@@ -116,6 +160,25 @@ statusOptions : any = [];
         this.loadingLogs = false;
         this.logs = [];
       },
+    });
+  }
+ratingQuestions: any[] = [];
+   loadMasterDataQuestions(){
+    // http://localhost:3000/api/rating/master?status=1
+    this.apiService.get('/rating/master?status=1').subscribe({
+      next: (response) => {
+        console.log(response);
+        this.ratingQuestions = response.data;
+        for (let question of this.ratingQuestions) {
+          if (!question.value) {
+            question.value = 3;
+          }
+        }
+        // Handle the response here
+      },
+      error: (error) => {
+        // Handle the error here
+      }
     });
   }
 }

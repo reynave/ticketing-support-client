@@ -4,6 +4,7 @@ import { loginGuard } from './core/guards/login.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { CaseDetailComponent } from './features/cases/cases-detail/case-detail.component';
 import { CaseListComponent } from './features/cases/case-list.component';
+import { CasesHistoryComponent } from './features/cases-history/cases-history.component';
 import { HomeComponent } from './features/home/home.component';
 import { ProjectDetailComponent } from './features/projects/project-detail/project-detail.component';
 import { ProjectListComponent } from './features/projects/project-list.component';
@@ -35,6 +36,11 @@ export const routes: Routes = [
 				path: 'cases',
 				component: CaseListComponent,
 			},
+
+				{
+				path: 'cases-history',
+				component: CasesHistoryComponent,
+			},
 			{
 				path: 'cases/:id',
 				component: CaseDetailComponent,
@@ -55,6 +61,8 @@ export const routes: Routes = [
 				path: 'profile',
 				component: ProfileComponent,
 			},
+
+			
 
 			// Add more routes here as needed
 

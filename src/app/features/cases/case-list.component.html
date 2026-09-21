@@ -4,11 +4,13 @@
       <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
          <div>
             <p class="label mb-1">Client Cases</p>
-            <h1 class="h3 mb-0">Daftar CASES</h1>
+            <h1 class="h3 mb-0">List for Open CASES</h1>
          </div>
          <div class="d-flex gap-2">
             <button class="btn btn-primary" (click)="openCreateModal(createCaseModal)"
                [disabled]="loadingOptions">Create Case</button>
+
+            <a  class="btn" href="javascript:void(0);" [routerLink]="['/cases-history']">History Cases</a>
             <!-- <button class="btn btn-outline-primary" (click)="loadCases()" [disabled]="loading">Refresh</button> -->
          </div>
       </div>

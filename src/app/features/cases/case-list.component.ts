@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ApiService } from '../../core/services/api.service';
 
@@ -23,7 +23,7 @@ interface CaseCreateForm {
 @Component({
   selector: 'app-case-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgbModalModule],
+  imports: [CommonModule, FormsModule, NgbModalModule, RouterLink],
   templateUrl: './case-list.component.html',
   styleUrl: './case-list.component.css',
 })
@@ -82,7 +82,7 @@ export class CaseListComponent implements OnInit {
       next: (response) => {
         this.loading = false;
         this.rows = Array.isArray(response?.data) ? response.data : [];
-         this.loadCasesClosed();
+       //  this.loadCasesClosed();
       },
       error: (error) => {
         this.loading = false;

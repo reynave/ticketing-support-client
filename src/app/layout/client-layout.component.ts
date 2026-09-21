@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { buildInfo } from '../../environments/build-info';
@@ -11,13 +11,22 @@ import { buildInfo } from '../../environments/build-info';
   templateUrl: './client-layout.component.html',
   styleUrl: './client-layout.component.css',
 })
-export class ClientLayoutComponent {
+export class ClientLayoutComponent implements OnInit {
+
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-
+  
   user$ = this.authService.currentUser$;
+  profile : any = '';
   buildTime: string = buildInfo.buildCode; // auto-generated on each build
   isMenuOpen = false;
+
+  ngOnInit(): void {
+    // Initialization logic here
+    console.log(this.authService.decodeToken());
+    this.profile = this.authService.decodeToken()
+  }
+
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;

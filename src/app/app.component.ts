@@ -13,5 +13,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.authService.bootstrapSession();
+
+     setInterval(() => {
+      window.location.reload();
+    }, 1000 * 60 * 55); // 5 minutes
+    
   }
 }

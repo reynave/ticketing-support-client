@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg topbar sticky-top">
     <div class="container-fluid px-3 px-md-4 nav-wrap">
       <a class="navbar-brand" routerLink="/home" (click)="closeMenu()">
-        <div>Thinktank's Client</div>
+        <div>{{profile?.company ||  'Client User'}}</div>
         <small>build {{buildTime}}</small>
       </a>
 
