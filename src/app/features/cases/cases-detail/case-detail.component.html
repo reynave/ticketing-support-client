@@ -164,6 +164,38 @@
           </div>
         </div>
       </div>
+
+      @if( detail?.ticketStatusId >= 900){ 
+           
+      <div class="bg-white p-3 rounded-2 shadow-sm border mb-5">
+
+          <table class="table  table-hover ">
+              <tbody>
+                  <tr *ngFor="let question of detail?.ratesDetail; let i = index">
+                      <td class="align-top pe-2">
+                          <span class="fw-semibold">{{ i + 1 }}.</span>
+                      </td>
+                      <td class="align-top">
+                          <span>{{ question.name }}</span>
+                      </td>
+                      <td>
+                          <ngb-rating [rate]="question.value" [max]="5" [readonly]="true">
+                              <ng-template let-fill="fill" let-index="index">
+                                  <i class="bi-star{{ fill === 100 ? '-fill' : '' }}"
+                                      [class.filled]="fill === 100" [class.low]="index < 2"></i>
+                              </ng-template>
+                          </ngb-rating>
+                      </td>
+                      <Td>
+                          <span class="ms-2">{{ question.value || 0 }}</span>
+                      </Td>
+                  </tr>
+          </table>
+
+           
+      </div>
+
+      }
  
 
 

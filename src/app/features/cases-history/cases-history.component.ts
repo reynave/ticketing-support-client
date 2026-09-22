@@ -54,15 +54,14 @@ export class CasesHistoryComponent implements OnInit {
   ticketCategories: any[] = [];
   assignUsers: any[] = [];
   modules: any[] = [];
- 
+
   goBack() {
     history.back();
   }
-  ngOnInit(): void {  
-    this.loadCasesClosed(); 
+  ngOnInit(): void {
+    this.loadCasesClosed();
   }
 
-  
   loadCasesClosed(): void {
     this.loading = true;
     this.errorMessage = '';
@@ -96,12 +95,19 @@ export class CasesHistoryComponent implements OnInit {
 
   resetFilters(): void {
     this.keyword = '';
-    this.selectedStatus = ''; 
+    this.selectedStatus = '';
     this.loadCasesClosed();
   }
 
-  
- 
+  fnRate(rate: number) {
+    if (rate < 2) {
+      return 'text-bg-danger';
+    } else if (rate == 3) {
+      return 'text-bg-warning';
+    } else {
+      return 'text-bg-success';
+    }
+  }
 
   trackByCase(_: number, row: any): string {
     return String(row?.id || row?.crNoRef || _);
@@ -116,5 +122,4 @@ export class CasesHistoryComponent implements OnInit {
 
     void this.router.navigate(['/cases', id]);
   }
- 
 }

@@ -1,12 +1,12 @@
 <div class="container">
 
     <section class="cases-wrap">
-      
+
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
             <div>
-                  <a class="btn btn-light border" href="javascript:void(0);" (click)="goBack()">Back</a>
+                <a class="btn btn-light border" href="javascript:void(0);" (click)="goBack()">Back</a>
             </div>
-            <div>  
+            <div>
                 <h1 class="h3 mb-0">History of CASES</h1>
             </div>
 
@@ -58,13 +58,21 @@
                     <div class="card-body p-2 p-md-3">
                         <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-2">
                             <div>
-
                                 <p class="case-id mb-1">{{ row?.crNoRef || row?.id || '-' }}</p>
                                 <h3 class="h5 mb-1">{{ row?.title || 'Untitled Case' }}</h3>
                                 <p class="text-muted mb-0">{{ row?.projectName || row?.projectId || '-' }}</p>
                             </div>
-                            <span class="badge text-bg-light border">{{ row?.ticketStatusName || row?.ticketStatusId ||
-                                'N/A' }}</span>
+                            <Div >
+                                <span class="badge text-bg-light border mx-2">{{ row?.ticketStatusName || row?.ticketStatusId
+                                    ||
+                                    'N/A' }} 
+                                </span>
+                                <span class="badge  border" [class]="fnRate(row?.rating)">
+                                   RATE  {{ row?.rating || 'N/A' }} 
+                                </span>
+                            </Div>
+
+
                         </div>
                         <div class="meta d-flex flex-wrap gap-3">
                             <span><strong>Submit :</strong> {{ row?.submitDate || row?.inputDate || '-' }}</span>
@@ -81,5 +89,5 @@
         </div>
     </section>
 
-     
+
 </div>
