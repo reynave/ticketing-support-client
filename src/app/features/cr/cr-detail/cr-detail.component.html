@@ -1,0 +1,225 @@
+<div class="container">
+  
+  <section class="case-detail-wrap">
+    <div class="row  mb-3 g-2">
+      <div class="col-3 col-md-2">
+        <button type="button" class="btn btn-outline-secondary" (click)="goBack()">Back</button>
+
+      </div>
+      @if(detail?.ticketStatusId >= 400  && detail?.ticketStatusId < 500){ 
+      <div class="col-12 col-md-8">
+    
+        <div class="d-flex gap-2">
+          <label for="selectedStatusId" class="align-content-center"> Status</label>
+          <select class="form-select" id="selectedStatusId" name="selectedStatusId" [(ngModel)]="selectedStatusId"
+            [disabled]="detail.clientEditable == 0">
+            <option *ngFor="let status of statusOptions" [value]="status.id">{{ status.name }}</option>
+
+          </select>
+
+        </div>
+      </div>
+    
+      <div class="col-12 col-md-2 d-grid">
+        <ng-container *ngIf="detail.clientEditable != 0">
+          <button type="button" class="btn btn-primary" (click)="submitStatus()"
+            [disabled]="loading || updatingStatus">{{ updatingStatus ? 'Menyimpan...' : 'Update' }}</button>
+        </ng-container>
+      </div>
+    }
+    @else{
+      <div class="col-md-8  col-3 text-end align-content-center">
+          <strong>Ticket Status : </strong>
+      </div>
+      <div class="col-md-2 col-6">
+        
+        <div class="form-control bg-light">
+          {{ detail?.ticketStatusName || detail?.ticketStatusId || '-' }}
+        </div>
+          
+      </div>
+    }
+ 
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger my-3" role="alert">{{ errorMessage }}</div>
+
+    <div *ngIf="loading" class="card border-0 shadow-sm">
+      <div class="card-body py-4 d-flex align-items-center gap-3 my-3">
+        <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+        <span>Memuat detail case...</span>
+      </div>
+    </div>
+
+    <div *ngIf="statusErrorMessage" class="alert alert-danger py-1 px-2 my-2 my-3" role="alert">{{ statusErrorMessage }}
+    </div>
+    <div *ngIf="statusSuccessMessage" class="alert alert-success py-1 px-2 my-2 my-3" role="alert">{{ statusSuccessMessage }}</div> 
+    <div *ngIf="detail?.ratesBy == '' && detail?.ticketStatusId >= 900">
+      <div class="alert alert-warning text-center">
+        <p>Please provide a rating for this case. <br>Your rating is important for us to improve our service.</p> 
+      </div> 
+      
+      <div class="bg-white p-3 rounded-2 shadow-sm border mb-5">
+
+          <table class="table  table-hover ">
+              <tbody>
+                  <tr *ngFor="let question of ratingQuestions; let i = index">
+                      <td class="align-top pe-2">
+                          <span class="fw-semibold">{{ i + 1 }}.</span>
+                      </td>
+                      <td class="align-top">
+                          <span>{{ question.name }}</span>
+                      </td>
+                      <td>
+                          <ngb-rating [(rate)]="question.value" [max]="5">
+                              <ng-template let-fill="fill" let-index="index">
+                                  <i class="bi-star{{ fill === 100 ? '-fill' : '' }}"
+                                      [class.filled]="fill === 100" [class.low]="index < 2"></i>
+                              </ng-template>
+                          </ngb-rating>
+                      </td>
+                      <Td>
+                          <span class="ms-2">{{ question.value || 0 }}</span>
+                      </Td>
+                  </tr>
+          </table>
+
+          <div class="text-center my-3 d-grid">
+              <button type="button" class="btn btn-lg btn-warning" (click)="onSubmitRate()">Submit</button>
+          </div>
+      </div>
+  
+    
+    </div>
+     
+
+
+    <div *ngIf="!loading && detail" class="row g-3">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm detail-card">
+          <div class="card-body p-3 p-md-4">
+            <div class="row mb-3 g-1">
+              <div class="col-12 col-md-{{ detail?.ratesBy !== '' ? 7 : 9 }} ">
+                <p class="case-id mb-1">{{ detail?.crNoRef || detail?.id || '-' }}</p>
+                <h1 class="h3 mb-2">{{ detail?.title || 'Untitled Case' }}</h1>
+                <p class="text-muted mb-3">{{ detail?.projectName || detail?.projectId || '-' }}</p>
+              </div>
+              <div class="col-6 col-md-2 text-md-end" *ngIf="detail?.ratesBy !== '' "> 
+                <p class="meta-label mb-1">Rating</p>
+                <div class="form-control bg-light"> {{ detail.rating }} </div> 
+              </div>
+              <div class="col-6 col-md-3 text-md-end">
+                <p class="meta-label mb-1">Submit Date</p>
+                <div class="form-control bg-light">{{ detail?.submitDate || detail?.inputDate || '-' }}</div>
+              </div>
+
+             
+
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-12 col-md-6 col-lg-3">
+                <p class="meta-label mb-1">Status</p>
+                
+                  <div class="form-control bg-light">
+                    {{ detail?.ticketStatusName || detail?.ticketStatusId || '-' }}
+                  </div>
+               
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <p class="meta-label mb-1">Severity</p>
+                 <div class="form-control bg-light">{{ detail?.ticketSeverityName || detail?.ticketSeverityId || '-' }}</div>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <p class="meta-label mb-1">Assign To</p>
+                <div class="form-control bg-light">{{ detail?.assignToName || detail?.assignTo || '-' }}</div>
+              </div>
+              @if(detail?.hours > 0){ 
+              <div class="col-12 col-md-6 col-lg-3">
+                <p class="meta-label mb-1">Estimation</p>
+                <div class="form-control bg-light">
+                  {{ detail?.ticketBased != 0  ? detail?.ticketEstimationCost + ' Tickets or'  || '' : '' }}  {{ detail?.hours || '0' }} Hours</div>
+              </div>
+              }
+              <!-- <div class="col-12 col-md-6 col-lg-4">
+                <p class="meta-label mb-1">Target Completion</p>
+                <p class="meta-value mb-0">{{ detail?.targetCompletionDate || detail?.deadlineDateTime || '-' }}</p>
+              </div> -->
+            </div>
+
+            <div>
+              <p class="meta-label mb-1">Description</p>
+              <div class="alert alert-light">
+                <div class="desc mb-0" [innerHTML]="detail?.description || 'Tidak ada deskripsi.'"></div>
+              </div>
+            </div>
+ 
+            <div>
+              <p class="meta-label mb-1">Solution</p>
+              <div class="alert alert-light">
+                <div class="desc mb-0" [innerHTML]="detail?.taskSolution || 'Tidak ada solusi.'"></div>
+              </div>
+            </div> 
+
+          </div>
+        </div>
+      </div>
+
+      @if( detail?.ticketStatusId >= 900){ 
+           
+      <div class="bg-white p-3 rounded-2 shadow-sm border mb-5">
+
+          <table class="table  table-hover ">
+              <tbody>
+                  <tr *ngFor="let question of detail?.ratesDetail; let i = index">
+                      <td class="align-top pe-2">
+                          <span class="fw-semibold">{{ i + 1 }}.</span>
+                      </td>
+                      <td class="align-top">
+                          <span>{{ question.name }}</span>
+                      </td>
+                      <td>
+                          <ngb-rating [rate]="question.value" [max]="5" [readonly]="true">
+                              <ng-template let-fill="fill" let-index="index">
+                                  <i class="bi-star{{ fill === 100 ? '-fill' : '' }}"
+                                      [class.filled]="fill === 100" [class.low]="index < 2"></i>
+                              </ng-template>
+                          </ngb-rating>
+                      </td>
+                      <Td>
+                          <span class="ms-2">{{ question.value || 0 }}</span>
+                      </Td>
+                  </tr>
+          </table>
+
+           
+      </div>
+
+      }
+ 
+
+
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h5 mb-0">Activity Logs</h2>
+              <small class="text-muted" *ngIf="loadingLogs">Memuat logs...</small>
+            </div>
+
+            <div *ngIf="!loadingLogs && !logs.length" class="text-muted">Belum ada activity logs.</div>
+
+            <div class="log-list" *ngIf="logs.length">
+              <div class="log-item" *ngFor="let log of logs">
+                <p class="mb-1 fw-semibold">{{ log?.inputByName || log?.submitByName || log?.submitBy || 'System' }}</p>
+                <p class="mb-1 desc" [innerHTML]="log?.description || '-'"></p>
+                <small class="text-muted">{{ log?.inputDate || log?.submitDate || '-' }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>

@@ -8,13 +8,13 @@ import { ApiService } from '../../core/services/api.service';
  
 
 @Component({
-  selector: 'app-cases-history',
+  selector: 'app-cr-history',
   standalone: true,
   imports: [CommonModule, FormsModule, NgbModalModule],
-  templateUrl: './cases-history.component.html',
-  styleUrl: './cases-history.component.css',
+  templateUrl: './cr-history.component.html',
+  styleUrl: './cr-history.component.css'
 })
-export class CasesHistoryComponent implements OnInit {
+export class CrHistoryComponent implements OnInit {
   private readonly apiService = inject(ApiService);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
@@ -63,7 +63,7 @@ export class CasesHistoryComponent implements OnInit {
       query.ticketStatusId = this.selectedStatus;
     }
 
-    this.apiService.get('/cases/closed', query).subscribe({
+    this.apiService.get('/change-requests/closed', query).subscribe({
       next: (response) => {
         this.loading = false;
         this.closedRows = Array.isArray(response?.data) ? response.data : [];
@@ -107,6 +107,6 @@ export class CasesHistoryComponent implements OnInit {
       return;
     }
 
-    void this.router.navigate(['/cases', id]);
+    void this.router.navigate(['/change-requests', id]);
   }
 }

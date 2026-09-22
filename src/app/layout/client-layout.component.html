@@ -19,13 +19,18 @@
             </a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" routerLink="/projects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+              Projects
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" routerLink="/cases" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
               Cases
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/projects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
-              Projects
+           <li class="nav-item">
+            <a class="nav-link" routerLink="/cr" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+              Changes Request
             </a>
           </li>
         </ul>

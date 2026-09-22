@@ -11,65 +11,75 @@ import { ProjectListComponent } from './features/projects/project-list.component
 import { ProfileComponent } from './features/profile/profile.component';
 import { ClientLayoutComponent } from './layout/client-layout.component';
 import { RateComponent } from './features/rate/rate.component';
+import { CrHistoryComponent } from './features/cr-history/cr-history.component';
+import { CrDetailComponent } from './features/cr/cr-detail/cr-detail.component';
+import { CrComponent } from './features/cr/cr.component';
 
 export const routes: Routes = [
-	{
-		path: 'login',
-		component: LoginComponent,
-		canActivate: [loginGuard],
-	},
-	{
-		path: '',
-		component: ClientLayoutComponent,
-		canActivate: [authGuard],
-		children: [
-			{
-				path: '',
-				pathMatch: 'full',
-				redirectTo: 'home',
-			},
-			{
-				path: 'home',
-				component: HomeComponent,
-			},
-			{
-				path: 'cases',
-				component: CaseListComponent,
-			},
+  {
+    path: 'login',
+    component: LoginComponent,
+    canActivate: [loginGuard],
+  },
+  {
+    path: '',
+    component: ClientLayoutComponent,
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'home',
+      },
+      {
+        path: 'home',
+        component: HomeComponent,
+      },
+      {
+        path: 'cases',
+        component: CaseListComponent,
+      },
 
-				{
-				path: 'cases-history',
-				component: CasesHistoryComponent,
-			},
-			{
-				path: 'cases/:id',
-				component: CaseDetailComponent,
-			},
-			{
-				path: 'cases/:id/rate',
-				component: RateComponent,
-			},
-			{
-				path: 'projects',
-				component: ProjectListComponent,
-			},
-			{
-				path: 'projects/:id',
-				component: ProjectDetailComponent,
-			},
-			{
-				path: 'profile',
-				component: ProfileComponent,
-			},
+      {
+        path: 'cases-history',
+        component: CasesHistoryComponent,
+      },
+      {
+        path: 'cases/:id',
+        component: CaseDetailComponent,
+      },
 
-			
+      {
+        path: 'cr',
+        component: CrComponent,
+      },
+      {
+        path: 'cr-history',
+        component: CrHistoryComponent,
+      },
+      {
+        path: 'cr/:id',
+        component: CrHistoryComponent,
+      },
 
-			// Add more routes here as needed
+      {
+        path: 'projects',
+        component: ProjectListComponent,
+      },
+      {
+        path: 'projects/:id',
+        component: ProjectDetailComponent,
+      },
+      {
+        path: 'profile',
+        component: ProfileComponent,
+      },
 
-		],
-	},
-	{
-		path: '**',
-		redirectTo: 'home',
-	},
+      // Add more routes here as needed
+    ],
+  },
+  {
+    path: '**',
+    redirectTo: 'home',
+  },
 ];
