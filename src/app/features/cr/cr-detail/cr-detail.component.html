@@ -12,7 +12,7 @@
         <div class="d-flex gap-2">
           <label for="selectedStatusId" class="align-content-center"> Status</label>
           <select class="form-select" id="selectedStatusId" name="selectedStatusId" [(ngModel)]="selectedStatusId"
-            [disabled]="detail.clientEditable == 0">
+            [disabled]="true">
             <option *ngFor="let status of statusOptions" [value]="status.id">{{ status.name }}</option>
 
           </select>
@@ -20,12 +20,7 @@
         </div>
       </div>
     
-      <div class="col-12 col-md-2 d-grid">
-        <ng-container *ngIf="detail.clientEditable != 0">
-          <button type="button" class="btn btn-primary" (click)="submitStatus()"
-            [disabled]="loading || updatingStatus">{{ updatingStatus ? 'Menyimpan...' : 'Update' }}</button>
-        </ng-container>
-      </div>
+       
     }
     @else{
       <div class="col-md-8  col-3 text-end align-content-center">
@@ -126,10 +121,7 @@
                   </div>
                
               </div>
-              <div class="col-12 col-md-6 col-lg-3">
-                <p class="meta-label mb-1">Severity</p>
-                 <div class="form-control bg-light">{{ detail?.ticketSeverityName || detail?.ticketSeverityId || '-' }}</div>
-              </div>
+              
               <div class="col-12 col-md-6 col-lg-3">
                 <p class="meta-label mb-1">Assign To</p>
                 <div class="form-control bg-light">{{ detail?.assignToName || detail?.assignTo || '-' }}</div>

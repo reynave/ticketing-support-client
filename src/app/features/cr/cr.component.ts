@@ -15,7 +15,6 @@ interface CaseCreateForm {
   targetCompletionDate: string;
   ticketStatusId: string;
   ticketCategoryId: string;
-  severityId: string;
   deadlineDateTime: string;
   productChildId: string;
 }
@@ -237,7 +236,7 @@ export class CrComponent implements OnInit {
     const futureDate = new Date(today.getTime() + 50 * 60 * 1000);
     const futureHhiiss = `${String(futureDate.getHours()).padStart(2, '0')}:${String(futureDate.getMinutes()).padStart(2, '0')}:${String(futureDate.getSeconds()).padStart(2, '0')}`;
 
-    this.apiService.get(`/project/${this.formModel.projectId}`).subscribe({
+    this.apiService.get(`/project/detail/${this.formModel.projectId}`).subscribe({
       next: (response) => {
         this.loading = false;
         const users = response?.data.users || null;
@@ -256,11 +255,7 @@ export class CrComponent implements OnInit {
 
         // saya mau hhiiss ditambah 3 jam
 
-        this.addHour =
-          this.ticketSeverities.find(
-            (severity: any) =>
-              String(severity?.id) === String(this.formModel.severityId),
-          )?.addHour || 0;
+        
 
         const addHour = this.addHour;
         const threeHoursLater = new Date(
@@ -281,9 +276,7 @@ export class CrComponent implements OnInit {
           ticketCategoryId: this.formModel.ticketCategoryId
             ? Number(this.formModel.ticketCategoryId)
             : null,
-          severityId: this.formModel.severityId
-            ? Number(this.formModel.severityId)
-            : null,
+        
           deadlineDateTime: deadlineDateTime,
           productChildId: this.formModel.productChildId
             ? Number(this.formModel.productChildId)
@@ -324,7 +317,7 @@ export class CrComponent implements OnInit {
       return;
     }
 
-    void this.router.navigate(['/change-requests', id]);
+    void this.router.navigate(['/cr', id]);
   }
 
   private loadOptions(): void {
@@ -404,8 +397,7 @@ export class CrComponent implements OnInit {
       submitDate: date,
       targetCompletionDate: date,
       ticketStatusId: '1',
-      ticketCategoryId: '',
-      severityId: '',
+      ticketCategoryId: '', 
       deadlineDateTime: '',
       productChildId: '',
     };

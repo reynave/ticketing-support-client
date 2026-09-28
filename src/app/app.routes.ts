@@ -59,7 +59,7 @@ export const routes: Routes = [
       },
       {
         path: 'cr/:id',
-        component: CrHistoryComponent,
+        component: CrDetailComponent,
       },
 
       {

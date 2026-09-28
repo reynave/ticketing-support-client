@@ -33,7 +33,7 @@ statusOptions : any = [];
     this.caseId = String(this.route.snapshot.paramMap.get('id') || '').trim();
 
     if (!this.caseId) {
-      void this.router.navigateByUrl('/cases');
+      void this.router.navigateByUrl('/cr');
       return;
     }
     this.loadMasterDataQuestions(); 
@@ -50,7 +50,7 @@ statusOptions : any = [];
     this.loading = true;
     this.errorMessage = '';
 
-    this.apiService.get(`/cases/${this.caseId}`).subscribe({
+    this.apiService.get(`/change-requests/${this.caseId}`).subscribe({
       next: (response) => {
         this.loading = false;
         this.detail = response?.data || null;
@@ -134,7 +134,7 @@ statusOptions : any = [];
       ticketStatusId: Number(this.selectedStatusId),
     };
 
-    this.apiService.put(`/cases/${this.caseId}/status`, payload).subscribe({
+    this.apiService.put(`/change-requests/${this.caseId}/status`, payload).subscribe({
       next: () => {
         this.updatingStatus = false;
         this.statusSuccessMessage = 'Status berhasil diperbarui.';
@@ -151,7 +151,7 @@ statusOptions : any = [];
   loadLogs(): void {
     this.loadingLogs = true;
 
-    this.apiService.get(`/cases/${this.caseId}/logs`).subscribe({
+    this.apiService.get(`/change-requests/${this.caseId}/logs`).subscribe({
       next: (response) => {
         this.loadingLogs = false;
         this.logs = Array.isArray(response?.data) ? response.data : [];
