@@ -63,7 +63,7 @@ export class CrHistoryComponent implements OnInit {
       query.ticketStatusId = this.selectedStatus;
     }
 
-    this.apiService.get('/change-requests/closed', query).subscribe({
+    this.apiService.get('/client-portal/change-requests/closed', query).subscribe({
       next: (response) => {
         this.loading = false;
         this.closedRows = Array.isArray(response?.data) ? response.data : [];
@@ -75,7 +75,7 @@ export class CrHistoryComponent implements OnInit {
         this.loading = false;
         this.closedRows = [];
         this.errorMessage =
-          error?.error?.message || 'Gagal memuat daftar cases.';
+          error?.error?.message || 'Failed to load change requests list.';
       },
     });
   }

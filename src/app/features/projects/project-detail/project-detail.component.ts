@@ -43,7 +43,7 @@ export class ProjectDetailComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    this.apiService.get(`/project/${this.projectId}`).subscribe({
+    this.apiService.get(`/client-portal/projects/${this.projectId}`).subscribe({
       next: (response) => {
         this.loading = false;
         this.detail = response?.data || null;
@@ -51,7 +51,7 @@ export class ProjectDetailComponent implements OnInit {
       error: (error) => {
         this.loading = false;
         this.detail = null;
-        this.errorMessage = error?.error?.message || 'Gagal memuat detail project.';
+        this.errorMessage = error?.error?.message || 'Failed to load project detail.';
       },
     });
   }
@@ -59,7 +59,7 @@ export class ProjectDetailComponent implements OnInit {
   loadTicketBalance(): void {
     this.loadingBalance = true;
 
-    this.apiService.get(`/ticket-balance/project/${this.projectId}`).subscribe({
+    this.apiService.get(`/client-portal/ticket-balance/project/${this.projectId}`).subscribe({
       next: (response) => {
         this.loadingBalance = false;
         this.ticketBalances = Array.isArray(response?.data) ? response.data : [];

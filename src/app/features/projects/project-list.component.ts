@@ -40,7 +40,7 @@ export class ProjectListComponent implements OnInit {
       query.keyword = this.keyword.trim();
     }
 
-    this.apiService.get('/project', query).subscribe({
+    this.apiService.get('/client-portal/projects', query).subscribe({
       next: (response) => {
         this.loading = false;
         this.rows = Array.isArray(response?.data) ? response.data : [];
@@ -48,7 +48,7 @@ export class ProjectListComponent implements OnInit {
       error: (error) => {
         this.loading = false;
         this.rows = [];
-        this.errorMessage = error?.error?.message || 'Gagal memuat daftar project.';
+        this.errorMessage = error?.error?.message || 'Failed to load project list.';
       },
     });
   }

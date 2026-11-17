@@ -63,7 +63,7 @@ export class CasesHistoryComponent implements OnInit {
       query.ticketStatusId = this.selectedStatus;
     }
 
-    this.apiService.get('/cases/closed', query).subscribe({
+    this.apiService.get('/client-portal/cases/closed', query).subscribe({
       next: (response) => {
         this.loading = false;
         this.closedRows = Array.isArray(response?.data) ? response.data : [];
@@ -75,7 +75,7 @@ export class CasesHistoryComponent implements OnInit {
         this.loading = false;
         this.closedRows = [];
         this.errorMessage =
-          error?.error?.message || 'Gagal memuat daftar cases.';
+          error?.error?.message || 'Failed to load cases list.';
       },
     });
   }

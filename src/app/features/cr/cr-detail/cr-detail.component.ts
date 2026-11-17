@@ -50,7 +50,7 @@ statusOptions : any = [];
     this.loading = true;
     this.errorMessage = '';
 
-    this.apiService.get(`/change-requests/${this.caseId}`).subscribe({
+    this.apiService.get(`/client-portal/change-requests/${this.caseId}`).subscribe({
       next: (response) => {
         this.loading = false;
         this.detail = response?.data || null;
@@ -61,13 +61,13 @@ statusOptions : any = [];
       error: (error) => {
         this.loading = false;
         this.detail = null;
-        this.errorMessage = error?.error?.message || 'Gagal memuat detail case.';
+        this.errorMessage = error?.error?.message || 'Failed to load change request detail.';
       },
     });
   }
 
   loadStatusOptions(): void {
-    this.apiService.get(`/master/status/cases`).subscribe({
+    this.apiService.get(`/client-portal/master/status/cases`).subscribe({
       next: (response) => { 
         this.statusOptions = Array.isArray(response?.data) ? response.data : [];
         // tolong hapus id < 400
@@ -105,7 +105,7 @@ statusOptions : any = [];
 
     console.log(payload, this.caseId, averageRating);
 
-    this.apiService.post('/rating/rate', {
+    this.apiService.post('/client-portal/rating/rate', {
       ticketId: this.caseId,
       averageRating: averageRating,
       ratings: payload, 
@@ -134,16 +134,16 @@ statusOptions : any = [];
       ticketStatusId: Number(this.selectedStatusId),
     };
 
-    this.apiService.put(`/change-requests/${this.caseId}/status`, payload).subscribe({
+    this.apiService.put(`/client-portal/change-requests/${this.caseId}/status`, payload).subscribe({
       next: () => {
         this.updatingStatus = false;
-        this.statusSuccessMessage = 'Status berhasil diperbarui.';
+        this.statusSuccessMessage = 'Status updated successfully.';
         this.loadDetail();
         this.loadLogs();
       },
       error: (error) => {
         this.updatingStatus = false;
-        this.statusErrorMessage = error?.error?.message || 'Gagal memperbarui status.';
+        this.statusErrorMessage = error?.error?.message || 'Failed to update status.';
       },
     });
   }
@@ -151,7 +151,7 @@ statusOptions : any = [];
   loadLogs(): void {
     this.loadingLogs = true;
 
-    this.apiService.get(`/change-requests/${this.caseId}/logs`).subscribe({
+    this.apiService.get(`/client-portal/change-requests/${this.caseId}/logs`).subscribe({
       next: (response) => {
         this.loadingLogs = false;
         this.logs = Array.isArray(response?.data) ? response.data : [];
@@ -165,7 +165,7 @@ statusOptions : any = [];
 ratingQuestions: any[] = [];
    loadMasterDataQuestions(){
     // http://localhost:3000/api/rating/master?status=1
-    this.apiService.get('/rating/master?status=1').subscribe({
+    this.apiService.get('/client-portal/rating/master?status=1').subscribe({
       next: (response) => {
         console.log(response);
         this.ratingQuestions = response.data;

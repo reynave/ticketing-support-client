@@ -2,7 +2,7 @@
 
 <section class="project-detail-wrap">
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
-    <button type="button" class="btn btn-outline-secondary" (click)="goBack()">Kembali</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="goBack()">Back</button>
     <button type="button" class="btn btn-outline-primary" (click)="loadDetail()" [disabled]="loading">Refresh</button>
   </div>
 
@@ -11,7 +11,7 @@
   <div *ngIf="loading" class="card border-0 shadow-sm">
     <div class="card-body py-4 d-flex align-items-center gap-3">
       <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
-      <span>Memuat detail project...</span>
+      <span>Loading project detail...</span>
     </div>
   </div>
 

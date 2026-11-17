@@ -77,7 +77,7 @@ export class CrComponent implements OnInit {
       query.ticketStatusId = this.selectedStatus;
     }
 
-    this.apiService.get('/change-requests', query).subscribe({
+    this.apiService.get('/client-portal/change-requests', query).subscribe({
       next: (response) => {
         this.loading = false;
         this.rows = Array.isArray(response?.data) ? response.data : [];
@@ -87,7 +87,7 @@ export class CrComponent implements OnInit {
         this.loading = false;
         this.rows = [];
         this.errorMessage =
-          error?.error?.message || 'Gagal memuat daftar change-requests.';
+          error?.error?.message || 'Failed to load change requests list.';
       },
     });
   }
@@ -105,7 +105,7 @@ export class CrComponent implements OnInit {
       query.ticketStatusId = this.selectedStatus;
     }
 
-    this.apiService.get('/change-requests/closed', query).subscribe({
+    this.apiService.get('/client-portal/change-requests/closed', query).subscribe({
       next: (response) => {
         this.loading = false;
         this.closedRows = Array.isArray(response?.data) ? response.data : [];
@@ -117,7 +117,7 @@ export class CrComponent implements OnInit {
         this.loading = false;
         this.closedRows = [];
         this.errorMessage =
-          error?.error?.message || 'Gagal memuat daftar change-requests.';
+          error?.error?.message || 'Failed to load change requests list.';
       },
     });
   }
@@ -165,7 +165,7 @@ export class CrComponent implements OnInit {
 
      if( this.projects[projectIndex].ticketBased == 1) {
  
-    this.apiService.get('/client-ticket/balance/client/' + this.formModel.projectId).subscribe({
+    this.apiService.get('/client-portal/client-ticket/balance/client/' + this.formModel.projectId).subscribe({
       next: (response) => {
         console.log('project details', response.data);
         this.clientBalance = response.data?.balance || 0;
@@ -222,7 +222,7 @@ export class CrComponent implements OnInit {
 
     if (!submitBy) {
       this.modalErrorMessage =
-        'Session user tidak ditemukan. Silakan login ulang.';
+        'User session not found. Please log in again.';
       return;
     }
 
@@ -236,7 +236,7 @@ export class CrComponent implements OnInit {
     const futureDate = new Date(today.getTime() + 50 * 60 * 1000);
     const futureHhiiss = `${String(futureDate.getHours()).padStart(2, '0')}:${String(futureDate.getMinutes()).padStart(2, '0')}:${String(futureDate.getSeconds()).padStart(2, '0')}`;
 
-    this.apiService.get(`/project/detail/${this.formModel.projectId}`).subscribe({
+    this.apiService.get(`/client-portal/projects/detail/${this.formModel.projectId}`).subscribe({
       next: (response) => {
         this.loading = false;
         const users = response?.data.users || null;
@@ -284,24 +284,24 @@ export class CrComponent implements OnInit {
           assignTo: asManager.id,
         };
 
-        this.apiService.post('/change-requests', payload).subscribe({
+        this.apiService.post('/client-portal/change-requests', payload).subscribe({
           next: () => {
             this.saving = false;
             this.modalRef?.close();
-            this.successMessage = 'Case berhasil dibuat.';
+            this.successMessage = 'Change request created successfully.';
             this.loadCr();
           },
           error: (error) => {
             this.saving = false;
             this.modalErrorMessage =
-              error?.error?.message || 'Gagal membuat case.';
+              error?.error?.message || 'Failed to create change request.';
           },
         });
       },
       error: (error) => {
         this.loading = false;
         this.errorMessage =
-          error?.error?.message || 'Gagal memuat detail project.';
+          error?.error?.message || 'Failed to load project detail.';
       },
     });
   }
@@ -324,13 +324,13 @@ export class CrComponent implements OnInit {
     this.loadingOptions = true;
      
 
-    this.apiService.get('/project', { status: 1 }).subscribe({
+    this.apiService.get('/client-portal/projects', { status: 1 }).subscribe({
       next: (projectResponse) => {
         this.projects = Array.isArray(projectResponse?.data)
           ? projectResponse.data
           : [];
 
-        this.apiService.get('/ticket-categories', { presence: 1 }).subscribe({
+        this.apiService.get('/client-portal/ticket-categories', { presence: 1 }).subscribe({
           next: (categoryResponse) => {
             this.allTicketCategories = Array.isArray(categoryResponse?.data)
               ? categoryResponse.data
@@ -338,7 +338,7 @@ export class CrComponent implements OnInit {
             this.ticketCategories = [];
 
             this.apiService
-              .get('/master/ticket-severities', { presence: 1 })
+              .get('/client-portal/master/ticket-severities', { presence: 1 })
               .subscribe({
                 next: (severityResponse) => {
                   this.ticketSeverities = Array.isArray(severityResponse?.data)

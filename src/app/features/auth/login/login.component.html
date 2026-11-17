@@ -4,12 +4,18 @@
 
   <div class="container py-5">
     <div class="row justify-content-center align-items-center min-vh-100 g-4">
+      
       <div class="col-12 col-lg-6">
+       
         <div class="brand-panel p-4 p-md-5">
+          <div class="mb-4">
+             <img src="https://8thinktank.com/wp-content/uploads/2024/05/think-tank-solusindo.png" alt="think-tank-solusindo"  
+             width="50%" height="auto" />
+          </div>
           <p class="eyebrow mb-2">Thinktank Client Portal</p>
-          <h1 class="display-6 fw-semibold mb-3">Akses cepat ke semua CASES Anda.</h1>
+          <h1 class="display-6 fw-semibold mb-3">Quick access to all your CASES</h1>
           <p class="lead-text mb-0">
-            Pantau progres case, status, dan update terbaru dalam satu dashboard client yang ringkas.
+           Monitor case progress, status, and the latest updates—all in one concise client dashboard.
           </p>
         </div>
       </div>
@@ -17,8 +23,8 @@
       <div class="col-12 col-md-8 col-lg-5">
         <div class="card login-card border-0 shadow-lg">
           <div class="card-body p-4 p-md-5">
-            <h2 class="h4 fw-semibold mb-1">Masuk</h2>
-            <p class="text-muted mb-4">Gunakan akun client Anda untuk melanjutkan.</p>
+            <h2 class="h4 fw-semibold mb-1">Login</h2>
+            <p class="text-muted mb-4">Use your client account to continue.</p>
 
             <div *ngIf="errorMessage" class="alert alert-danger py-2" role="alert">
               {{ errorMessage }}
@@ -36,10 +42,10 @@
                   required
                   email
                   #emailModel="ngModel"
-                  placeholder="nama@perusahaan.com"
+                  placeholder="name@company.com"
                 />
                 <div *ngIf="emailModel.invalid && (emailModel.dirty || emailModel.touched)" class="invalid-text mt-1">
-                  Email wajib diisi dengan format valid.
+                  Email is required and must be a valid format.
                 </div>
               </div>
 
@@ -55,13 +61,13 @@
                     required
                     minlength="6"
                     #passwordModel="ngModel"
-                    placeholder="Masukkan password"
+                    placeholder="Enter password"
                   />
                   <button
                     type="button"
                     class="btn btn-outline-secondary"
                     (click)="togglePassword()"
-                    [attr.aria-label]="showPassword ? 'Sembunyikan password' : 'Tampilkan password'"
+                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
                   >
                     {{ showPassword ? 'Hide' : 'Show' }}
                   </button>
@@ -70,7 +76,7 @@
                   *ngIf="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)"
                   class="invalid-text mt-1"
                 >
-                  Password wajib diisi (minimal 6 karakter).
+                  Password is required (minimum 6 characters).
                 </div>
 
                  <div class="alert alert-info my-4 d-flex gap-2 align-items-start mb-3">
@@ -81,7 +87,7 @@
 
               <button type="submit" class="btn btn-accent btn-lg w-100" [disabled]="loginForm.invalid || loading">
                 <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
-                {{ loading ? 'Memproses...' : 'Masuk ke Cases' }}
+                {{ loading ? 'Processing...' : 'Login to Cases' }}
               </button>
             </form>
           </div>

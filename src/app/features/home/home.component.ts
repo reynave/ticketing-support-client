@@ -101,8 +101,8 @@ export class HomeComponent implements OnInit {
     this.errorMessage = '';
 
     forkJoin({
-      cases: this.apiService.get('/client-ticket/cases'),
-      changeRequests: this.apiService.get('/client-ticket/change-requests'),
+      cases: this.apiService.get('/client-portal/client-ticket/cases'),
+      changeRequests: this.apiService.get('/client-portal/client-ticket/change-requests'),
     }).subscribe({
       next: ({ cases, changeRequests }) => {
         this.loading = false;
@@ -115,7 +115,7 @@ export class HomeComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        this.errorMessage = error?.error?.message || 'Gagal memuat data dashboard.';
+        this.errorMessage = error?.error?.message || 'Failed to load dashboard data.';
       },
     });
   }

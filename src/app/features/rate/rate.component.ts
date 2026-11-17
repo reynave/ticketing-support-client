@@ -25,7 +25,7 @@ ratingQuestions: any[] = [];
   }
   loadMasterData(){
     // http://localhost:3000/api/rating/master?status=1
-    this.apiService.get('/rating/master?status=1').subscribe({
+    this.apiService.get('/client-portal/rating/master?status=1').subscribe({
       next: (response) => {
         console.log(response);
         this.ratingQuestions = response.data;

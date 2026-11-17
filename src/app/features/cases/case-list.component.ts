@@ -78,7 +78,7 @@ export class CaseListComponent implements OnInit {
       query.ticketStatusId = this.selectedStatus;
     }
 
-    this.apiService.get('/cases', query).subscribe({
+    this.apiService.get('/client-portal/cases', query).subscribe({
       next: (response) => {
         this.loading = false;
         this.rows = Array.isArray(response?.data) ? response.data : [];
@@ -88,7 +88,7 @@ export class CaseListComponent implements OnInit {
         this.loading = false;
         this.rows = [];
         this.errorMessage =
-          error?.error?.message || 'Gagal memuat daftar cases.';
+          error?.error?.message || 'Failed to load cases list.';
       },
     });
   }
@@ -106,7 +106,7 @@ export class CaseListComponent implements OnInit {
       query.ticketStatusId = this.selectedStatus;
     }
 
-    this.apiService.get('/cases/closed', query).subscribe({
+    this.apiService.get('/client-portal/cases/closed', query).subscribe({
       next: (response) => {
         this.loading = false;
         this.closedRows = Array.isArray(response?.data) ? response.data : [];
@@ -118,7 +118,7 @@ export class CaseListComponent implements OnInit {
         this.loading = false;
         this.closedRows = [];
         this.errorMessage =
-          error?.error?.message || 'Gagal memuat daftar cases.';
+          error?.error?.message || 'Failed to load cases list.';
       },
     });
   }
@@ -166,7 +166,7 @@ export class CaseListComponent implements OnInit {
 
      if( this.projects[projectIndex].ticketBased == 1) {
  
-    this.apiService.get('/client-ticket/balance/client/' + this.formModel.projectId).subscribe({
+    this.apiService.get('/client-portal/client-ticket/balance/client/' + this.formModel.projectId).subscribe({
       next: (response) => {
         console.log('project details', response.data);
         this.clientBalance = response.data?.balance || 0;
@@ -223,7 +223,7 @@ export class CaseListComponent implements OnInit {
 
     if (!submitBy) {
       this.modalErrorMessage =
-        'Session user tidak ditemukan. Silakan login ulang.';
+        'User session not found. Please log in again.';
       return;
     }
 
@@ -237,7 +237,7 @@ export class CaseListComponent implements OnInit {
     const futureDate = new Date(today.getTime() + 50 * 60 * 1000);
     const futureHhiiss = `${String(futureDate.getHours()).padStart(2, '0')}:${String(futureDate.getMinutes()).padStart(2, '0')}:${String(futureDate.getSeconds()).padStart(2, '0')}`;
 
-    this.apiService.get(`/project/${this.formModel.projectId}`).subscribe({
+    this.apiService.get(`/client-portal/projects/${this.formModel.projectId}`).subscribe({
       next: (response) => {
         this.loading = false;
         const users = response?.data.users || null;
@@ -291,24 +291,24 @@ export class CaseListComponent implements OnInit {
           assignTo: asManager.id,
         };
 
-        this.apiService.post('/cases', payload).subscribe({
+        this.apiService.post('/client-portal/cases', payload).subscribe({
           next: () => {
             this.saving = false;
             this.modalRef?.close();
-            this.successMessage = 'Case berhasil dibuat.';
+            this.successMessage = 'Case created successfully.';
             this.loadCases();
           },
           error: (error) => {
             this.saving = false;
             this.modalErrorMessage =
-              error?.error?.message || 'Gagal membuat case.';
+              error?.error?.message || 'Failed to create case.';
           },
         });
       },
       error: (error) => {
         this.loading = false;
         this.errorMessage =
-          error?.error?.message || 'Gagal memuat detail project.';
+          error?.error?.message || 'Failed to load project detail.';
       },
     });
   }
@@ -331,13 +331,13 @@ export class CaseListComponent implements OnInit {
     this.loadingOptions = true;
      
 
-    this.apiService.get('/project', { status: 1 }).subscribe({
+    this.apiService.get('/client-portal/projects', { status: 1 }).subscribe({
       next: (projectResponse) => {
         this.projects = Array.isArray(projectResponse?.data)
           ? projectResponse.data
           : [];
 
-        this.apiService.get('/ticket-categories', { presence: 1 }).subscribe({
+        this.apiService.get('/client-portal/ticket-categories', { presence: 1 }).subscribe({
           next: (categoryResponse) => {
             this.allTicketCategories = Array.isArray(categoryResponse?.data)
               ? categoryResponse.data
@@ -345,7 +345,7 @@ export class CaseListComponent implements OnInit {
             this.ticketCategories = [];
 
             this.apiService
-              .get('/master/ticket-severities', { presence: 1 })
+              .get('/client-portal/master/ticket-severities', { presence: 1 })
               .subscribe({
                 next: (severityResponse) => {
                   this.ticketSeverities = Array.isArray(severityResponse?.data)

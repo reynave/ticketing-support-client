@@ -40,7 +40,7 @@
       <div *ngIf="loading" class="card border-0 shadow-sm">
          <div class="card-body py-4 d-flex align-items-center gap-3">
             <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
-            <span>Sedang memuat Changes Request...</span>
+            <span>Loading Change Requests...</span>
          </div>
       </div>
 
@@ -95,7 +95,7 @@
                <div class="col-12">
                   <label class="form-label" for="caseTitle">Title Changes Request  <span class="text-danger">*</span></label>
                   <input id="caseTitle" name="title" class="form-control" [(ngModel)]="formModel.title" required
-                     maxlength="120" placeholder="Example: Integrasi report bulanan" />
+                     maxlength="120" placeholder="Example: Monthly report integration" />
                </div>
 
                <div class="col-12">
@@ -109,7 +109,7 @@
                   <label class="form-label" for="projectId">Project  <span class="text-danger">*</span></label>
                   <select id="projectId" name="projectId" class="form-select" [(ngModel)]="formModel.projectId"
                      (change)="onProjectChanged()" required>
-                     <option value="">Pilih project</option>
+                     <option value="">Select project</option>
                      <option *ngFor="let project of projects" [value]="project.id">{{ project.name || project.id
                         }}</option>
                   </select>
@@ -120,7 +120,7 @@
                <!-- <div class="col-12 col-md-6">
                   <label class="form-label" for="assignTo">Assign To</label>
                   <select id="assignTo" name="assignTo" class="form-select" [(ngModel)]="formModel.assignTo" required>
-                     <option value="">Pilih user</option>
+                     <option value="">Select user</option>
                      <option *ngFor="let user of assignUsers" [value]="user.id">{{ user.name || user.email ||
                         user.id }}</option>
                   </select>
@@ -138,6 +138,9 @@
                      </option>
                   </select>
                </div>
+
+
+
 
                <div class="col-12 col-lg-4">
                   <label class="form-label" for="productChildId">Module  <span class="text-danger">*</span></label>

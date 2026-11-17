@@ -74,7 +74,7 @@
               <label class="form-label" for="password">New Password</label>
               <input id="password" name="password" type="password" class="form-control" [(ngModel)]="formModel.password" minlength="6" #passwordModel="ngModel" placeholder="Leave blank if you do not want to change" />
               <div *ngIf="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)" class="invalid-text mt-1">
-                Password minimal 6 karakter.
+                Password must be at least 6 characters.
               </div>
             </div>
 

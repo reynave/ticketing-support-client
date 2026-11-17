@@ -59,7 +59,7 @@ export class ProfileComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        this.errorMessage = error?.error?.message || 'Gagal memuat profile.';
+        this.errorMessage = error?.error?.message || 'Failed to load profile.';
       },
     });
   }
@@ -70,7 +70,7 @@ export class ProfileComponent implements OnInit {
     }
 
     if (this.formModel.password && this.formModel.password !== this.formModel.confirmPassword) {
-      this.errorMessage = 'Konfirmasi password tidak sama.';
+      this.errorMessage = 'Password confirmation does not match.';
       return;
     }
 
@@ -96,13 +96,13 @@ export class ProfileComponent implements OnInit {
     this.apiService.put('/client-auth/profile', payload).subscribe({
       next: () => {
         this.saving = false;
-        this.successMessage = 'Profile berhasil diperbarui.';
+        this.successMessage = 'Profile updated successfully.';
         this.formModel.password = '';
         this.formModel.confirmPassword = '';
       },
       error: (error) => {
         this.saving = false;
-        this.errorMessage = error?.error?.message || 'Gagal memperbarui profile.';
+        this.errorMessage = error?.error?.message || 'Failed to update profile.';
       },
     });
   }
