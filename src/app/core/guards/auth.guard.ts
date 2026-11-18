@@ -10,5 +10,14 @@ export const authGuard: CanActivateFn = () => {
     return true;
   }
 
+  const tokenExpired = authService.isTokenExpired();
+
+  if (tokenExpired) {
+    // Token masih tersimpan tapi sudah expired: bersihkan agar tidak dipakai lagi.
+    authService.logout(false);
+
+    return router.createUrlTree(['/login'], { queryParams: { reason: 'expired' } });
+  }
+
   return router.createUrlTree(['/login']);
 };

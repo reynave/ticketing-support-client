@@ -54,6 +54,7 @@ export class CaseListComponent implements OnInit {
   ticketCategories: any[] = [];
   assignUsers: any[] = [];
   modules: any[] = [];
+  selectedProductName = '';
 
   formModel: CaseCreateForm = this.defaultForm();
 
@@ -133,6 +134,7 @@ export class CaseListComponent implements OnInit {
     this.formModel = this.defaultForm();
     this.assignUsers = [];
     this.modules = [];
+    this.selectedProductName = '';
     this.modalErrorMessage = '';
 
     this.modalRef = this.modalService.open(content, {
@@ -164,7 +166,7 @@ export class CaseListComponent implements OnInit {
       (project) => String(project?.id) === String(this.formModel.projectId)
     );  
 
-     if( this.projects[projectIndex].ticketBased == 1) {
+     if( projectIndex >= 0 && this.projects[projectIndex].ticketBased == 1) {
  
     this.apiService.get('/client-portal/client-ticket/balance/client/' + this.formModel.projectId).subscribe({
       next: (response) => {
@@ -185,6 +187,7 @@ export class CaseListComponent implements OnInit {
     const selectedProject = this.projects.find(
       (project) => String(project?.id) === String(this.formModel.projectId),
     );
+    this.selectedProductName = selectedProject?.productName || '';
     this.assignUsers = Array.isArray(selectedProject?.users)
       ? selectedProject.users
       : [];
@@ -213,7 +216,12 @@ export class CaseListComponent implements OnInit {
     this.formModel.ticketCategoryId = '';
     this.formModel.assignTo = '';
   }
+  /** Durasi SLA severity terpilih dalam jam (kolom `duration` pada ticket_severity). */
   addHour: number = 0;
+
+  /** Offset default target completion dihitung dari waktu submit (menit). */
+  private readonly targetCompletionOffsetMinutes = 50;
+
   submitCreate(form: NgForm): void {
     if (form.invalid || this.saving) {
       return;
@@ -222,99 +230,151 @@ export class CaseListComponent implements OnInit {
     const submitBy = this.resolveSubmitBy();
 
     if (!submitBy) {
-      this.modalErrorMessage =
-        'User session not found. Please log in again.';
+      this.modalErrorMessage = 'User session not found. Please log in again.';
       return;
     }
+
+    // Project list sudah membawa `users` (project_users) dan `modules`,
+    // jadi tidak perlu memanggil /client-portal/projects/:id lagi.
+    const project = this.projects.find(
+      (item: any) => String(item?.id) === String(this.formModel.projectId),
+    );
+
+    if (!project) {
+      this.modalErrorMessage =
+        'Selected project is not available. Please choose another project.';
+      return;
+    }
+
+    const projectUsers = Array.isArray(project?.users) ? project.users : [];
+    const assignee =
+      projectUsers.find(
+        (user: any) => user?.asManager === true || Number(user?.asManager) === 1,
+      ) || projectUsers[0];
+
+    if (!assignee?.id) {
+      this.modalErrorMessage =
+        'No PIC is assigned to this project. Please contact your administrator.';
+      return;
+    }
+
+    this.addHour =
+      Number(
+        this.ticketSeverities.find(
+          (severity: any) =>
+            String(severity?.id) === String(this.formModel.severityId),
+        )?.duration,
+      ) || 0;
+
+    // Backend menyimpan DATETIME MySQL: 'YYYY-MM-DD HH:mm:ss'.
+    const now = new Date();
+    const submitDate = this.toMySqlDateTime(now, this.formModel.submitDate);
+    const submitDateValue = new Date(submitDate.replace(' ', 'T'));
+
+    // deadlineDateTime = submitDate + durasi severity.
+    const deadlineDateTime = this.toMySqlDateTime(
+      this.addHours(submitDateValue, this.addHour),
+    );
+
+    // targetCompletionDate = submitDate + 50 menit (default awal).
+    const targetCompletionDate = this.toMySqlDateTime(
+      this.addHours(
+        submitDateValue,
+        this.targetCompletionOffsetMinutes / 60,
+      ),
+    );
+
+    const payload: any = {
+      title: this.formModel.title.trim(),
+      description: this.formModel.description.trim(),
+      projectId: this.formModel.projectId,
+      submitBy,
+      submitDate,
+      targetCompletionDate,
+      deadlineDateTime,
+      ticketStatusId: Number(this.formModel.ticketStatusId) || 1,
+      ticketCategoryId: this.formModel.ticketCategoryId
+        ? Number(this.formModel.ticketCategoryId)
+        : null,
+      severityId: this.formModel.severityId
+        ? Number(this.formModel.severityId)
+        : null,
+      productChildId: this.formModel.productChildId
+        ? Number(this.formModel.productChildId)
+        : null,
+      assignTo: String(assignee.id),
+    };
 
     this.saving = true;
     this.modalErrorMessage = '';
 
-    const today = new Date();
-    const hhiiss = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}:${String(today.getSeconds()).padStart(2, '0')}`;
-
-    // tolong buatkan tanggal dan jam hari ini di tambah 50 menit
-    const futureDate = new Date(today.getTime() + 50 * 60 * 1000);
-    const futureHhiiss = `${String(futureDate.getHours()).padStart(2, '0')}:${String(futureDate.getMinutes()).padStart(2, '0')}:${String(futureDate.getSeconds()).padStart(2, '0')}`;
-
-    this.apiService.get(`/client-portal/projects/${this.formModel.projectId}`).subscribe({
-      next: (response) => {
-        this.loading = false;
-        const users = response?.data.users || null;
-
-        // cari asManager = 1
-        let asManager =
-          users?.find((user: any) => user?.asManager === 1) || null;
-        console.log('users', users);
-
-        if (!asManager) {
-          asManager = users?.[0] || null;
-        }
-        console.log('asManager', asManager.id);
-
-        const today = new Date();
-
-        // saya mau hhiiss ditambah 3 jam
-
-        this.addHour =
-          this.ticketSeverities.find(
-            (severity: any) =>
-              String(severity?.id) === String(this.formModel.severityId),
-          )?.addHour || 0;
-
-        const addHour = this.addHour;
-        const threeHoursLater = new Date(
-          today.getTime() + addHour * 60 * 60 * 1000,
-        );
-        const hhiissPlus = threeHoursLater.toTimeString().split(' ')[0];
-        const deadlineDateTime =
-          `${this.formModel.submitDate}` + ' ' + hhiissPlus;
-
-        const payload: any = {
-          title: this.formModel.title.trim(),
-          description: this.formModel.description.trim(),
-          projectId: this.formModel.projectId,
-          submitBy,
-          submitDate: this.formModel.submitDate + `T${hhiiss}`,
-          targetCompletionDate: futureHhiiss,
-          ticketStatusId: Number(this.formModel.ticketStatusId),
-          ticketCategoryId: this.formModel.ticketCategoryId
-            ? Number(this.formModel.ticketCategoryId)
-            : null,
-          severityId: this.formModel.severityId
-            ? Number(this.formModel.severityId)
-            : null,
-          deadlineDateTime: deadlineDateTime,
-          productChildId: this.formModel.productChildId
-            ? Number(this.formModel.productChildId)
-            : null,
-          assignTo: asManager.id,
-        };
-
-        this.apiService.post('/client-portal/cases', payload).subscribe({
-          next: () => {
-            this.saving = false;
-            this.modalRef?.close();
-            this.successMessage = 'Case created successfully.';
-            this.loadCases();
-          },
-          error: (error) => {
-            this.saving = false;
-            this.modalErrorMessage =
-              error?.error?.message || 'Failed to create case.';
-          },
-        });
+    this.apiService.post('/client-portal/cases', payload).subscribe({
+      next: () => {
+        this.saving = false;
+        this.modalRef?.close();
+        this.successMessage = 'Case created successfully.';
+        this.loadCases();
       },
       error: (error) => {
-        this.loading = false;
-        this.errorMessage =
-          error?.error?.message || 'Failed to load project detail.';
+        this.saving = false;
+        this.modalErrorMessage =
+          error?.error?.message || 'Failed to create case.';
       },
     });
   }
 
+  /** Gabungkan tanggal (opsional 'YYYY-MM-DD') dengan jam dari `value`. */
+  private toMySqlDateTime(value: Date, dateOnly?: string): string {
+    const pickedDate = String(dateOnly || '').trim() || this.toDateValue(value);
+
+    return `${pickedDate} ${this.toTimeValue(value)}`;
+  }
+
+  private toDateValue(value: Date): string {
+    return `${value.getFullYear()}-${this.pad2(value.getMonth() + 1)}-${this.pad2(value.getDate())}`;
+  }
+
+  private toTimeValue(value: Date): string {
+    return `${this.pad2(value.getHours())}:${this.pad2(value.getMinutes())}:${this.pad2(value.getSeconds())}`;
+  }
+
+  private pad2(value: number): string {
+    return String(value).padStart(2, '0');
+  }
+
+  private addHours(value: Date, hours: number): Date {
+    return new Date(value.getTime() + hours * 60 * 60 * 1000);
+  }
+
   trackByCase(_: number, row: any): string {
     return String(row?.id || row?.crNoRef || _);
+  }
+
+  /**
+   * Ticket severity duration from API is stored in hours.
+   * Converts it into a readable label, e.g. 120 -> "5 Days", 4 -> "4 Hours",
+   * 30 -> "1 Day 6 Hours".
+   */
+  severityDurationLabel(duration: number | string | null | undefined): string {
+    const totalHours = Number(duration);
+
+    if (!Number.isFinite(totalHours) || totalHours <= 0) {
+      return '-';
+    }
+
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours - days * 24;
+    const parts: string[] = [];
+
+    if (days > 0) {
+      parts.push(`${days} ${days === 1 ? 'Day' : 'Days'}`);
+    }
+
+    if (hours > 0) {
+      parts.push(`${hours} ${hours === 1 ? 'Hour' : 'Hours'}`);
+    }
+
+    return parts.join(' ');
   }
 
   openDetail(row: any): void {

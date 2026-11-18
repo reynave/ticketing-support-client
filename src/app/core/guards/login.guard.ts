@@ -10,5 +10,10 @@ export const loginGuard: CanActivateFn = () => {
     return router.createUrlTree(['/cases']);
   }
 
+  if (authService.isTokenExpired()) {
+    // Token lama sudah expired: bersihkan supaya user harus login ulang.
+    authService.logout(false);
+  }
+
   return true;
 };

@@ -83,7 +83,8 @@
               <thead>
                 <tr>
                   <th>Date</th>
-                  <th>Title</th>
+                  <th>Title / Note</th>
+                  <th>Case ID</th>
                   <th class="text-end">In</th>
                   <th class="text-end">Out</th>
                   <th class="text-end">Balance</th>
@@ -93,11 +94,18 @@
               <tbody>
                 <tr *ngFor="let row of ticketBalances">
                   <td>{{ row?.date || '-' }}</td>
-                  <td>{{ row?.title || '-' }}</td>
+                  <td>{{ row?.title   }} {{ row?.note  }}</td>
+                  <td>
+                    @if (row?.caseId || row?.ticketId) {
+                    <a [routerLink]="['/cases', row?.caseId || row?.ticketId]" routerLinkActive="router-link-active" >
+                      {{ row?.caseId || row?.ticketId || '-' }}
+                    </a> 
+                  }
+                  </td>
                   <td class="text-end">{{ row?.ticketIn || 0 }}</td>
                   <td class="text-end">{{ row?.ticketOut || 0 }}</td>
                   <td class="text-end fw-semibold">{{ row?.balance || 0 }}</td>
-                  <td>{{ row?.note || '-' }}</td>
+                 
                 </tr>
               </tbody>
             </table>

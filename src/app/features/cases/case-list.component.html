@@ -95,22 +95,22 @@
             </div>
 
             <div class="row g-2 mb-3">
-               <div class="col-12">
+               <div class="col-12 mb-1">
                   <label class="form-label" for="projectId">Project <span class="text-danger">*</span></label>
                   <select id="projectId" name="projectId" class="form-select" [(ngModel)]="formModel.projectId"
                      (change)="onProjectChanged()" required>
-                     <option value="">Select project</option>
-                     <option *ngFor="let project of projects" [value]="project.id">{{ project.name || project.id
-                        }}</option>
+                     <option value="" *ngIf="!formModel.projectId">Select Project</option>
+                     <option *ngFor="let project of projects" [value]="project.id">{{ project.name || project.id }}
+                     </option>
                   </select>
                </div>
-               <div class="col-12">
+              <div class="col-12 mb-1">
                   <label class="form-label" for="caseTitle">Case Title <span class="text-danger">*</span></label>
                   <input id="caseTitle" name="title" class="form-control" [(ngModel)]="formModel.title" required
                      maxlength="120" placeholder="Example: Monthly report integration" />
                </div>
 
-               <div class="col-12">
+               <div class="col-12 mb-1">
                   <label class="form-label" for="caseDescription">Description <span class="text-danger">*</span></label>
                   <textarea id="caseDescription" name="description" class="form-control" rows="3"
                      [(ngModel)]="formModel.description" required
@@ -124,21 +124,32 @@
                   <label class="form-label" for="ticketCategoryId">Category <span class="text-danger">*</span></label>
                   <select id="ticketCategoryId" name="ticketCategoryId" class="form-select"
                      [(ngModel)]="formModel.ticketCategoryId">
-                     <option value="" *ngIf="!formModel.ticketCategoryId">Select category</option>
+                     <option value="" *ngIf="!formModel.ticketCategoryId">Select Products first</option>
                      <option *ngFor="let category of ticketCategories" [value]="category.id">{{ category.name }}
                      </option>
                   </select>
+                  <div>
+                     <em *ngIf="!formModel.ticketCategoryId || formModel.ticketCategoryId === ''"
+                        class="form-text small  text-danger">Category is required </em>
+
+                  </div>
+
                </div>
 
                <div class="col-12 col-lg-6">
-                  <label class="form-label" for="severityId">Severity <span class="text-danger">*</span></label>
+                  <label class="form-label" for="severityId">Ticket Duration Respond Time<span
+                        class="text-danger">*</span></label>
                   <select id="severityId" name="severityId" class="form-select" [(ngModel)]="formModel.severityId">
-                     <option value="" *ngIf="!formModel.severityId">Select severity</option>
-                     <option *ngFor="let severity of ticketSeverities" [value]="severity.id">{{ severity.name }}
+                     <option value="" *ngIf="!formModel.severityId">Select Respond Time</option>
+                     <option *ngFor="let severity of ticketSeverities" [value]="severity.id">{{ severity.name }} ({{
+                        severityDurationLabel(severity.duration) }})
                      </option>
                   </select>
-               </div>
 
+                  <div>
+                     <em *ngIf="!formModel.severityId"  class="form-text small  text-danger">Severity is required </em>
+                  </div>
+               </div>
             </div>
 
             <div class="row g-2 mb-3">
@@ -146,8 +157,8 @@
                <div class="col-12 col-lg-6">
                   <label class="form-label" for="productChildId">Product </label>
                   <div class="form-control">
-                     product name
-                     <!-- tampilak nnama product  yang berhubungan dengan project -->
+                     {{ selectedProductName || 'Select project first' }}
+
                   </div>
                </div>
 
@@ -158,10 +169,14 @@
                      <option value="" *ngIf="!formModel.productChildId">Select module</option>
                      <option *ngFor="let mod of modules" [value]="mod.id">{{ mod.name }}</option>
                   </select>
+
+                   <div>
+                     <em *ngIf="!formModel.projectId"  class="form-text small  text-danger">Module is required </em>
+                  </div>
                </div>
             </div>
 
- 
+
 
             <div class="alert alert-danger" *ngIf="balanceWarning">
                {{ balanceWarning }}

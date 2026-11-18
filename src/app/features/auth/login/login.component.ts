@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 interface LoginForm {
@@ -19,6 +19,7 @@ interface LoginForm {
 export class LoginComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   formModel: LoginForm = {
     email: '',
@@ -27,11 +28,17 @@ export class LoginComponent implements OnInit {
 
   loading = false;
   errorMessage = '';
+  sessionMessage = '';
   showPassword = false;
 
   ngOnInit(): void {
     if (this.authService.isAuthenticated) {
       void this.router.navigateByUrl('/home');
+      return;
+    }
+
+    if (this.route.snapshot.queryParamMap.get('reason') === 'expired') {
+      this.sessionMessage = 'Your session has expired. Please log in again.';
     }
   }
 

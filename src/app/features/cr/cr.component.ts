@@ -212,7 +212,12 @@ export class CrComponent implements OnInit {
     this.formModel.ticketCategoryId = '';
     this.formModel.assignTo = '';
   }
+
   addHour: number = 0;
+
+  /** Offset default target completion dihitung dari waktu submit (menit). */
+  private readonly targetCompletionOffsetMinutes = 50;
+
   submitCreate(form: NgForm): void {
     if (form.invalid || this.saving) {
       return;
@@ -221,89 +226,109 @@ export class CrComponent implements OnInit {
     const submitBy = this.resolveSubmitBy();
 
     if (!submitBy) {
-      this.modalErrorMessage =
-        'User session not found. Please log in again.';
+      this.modalErrorMessage = 'User session not found. Please log in again.';
       return;
     }
+
+    // Project list sudah membawa `users` (project_users) dan `modules`,
+    // jadi tidak perlu memanggil /client-portal/projects/detail/:id lagi.
+    const project = this.projects.find(
+      (item: any) => String(item?.id) === String(this.formModel.projectId),
+    );
+
+    if (!project) {
+      this.modalErrorMessage =
+        'Selected project is not available. Please choose another project.';
+      return;
+    }
+
+    const projectUsers = Array.isArray(project?.users) ? project.users : [];
+    const assignee =
+      projectUsers.find(
+        (user: any) => user?.asManager === true || Number(user?.asManager) === 1,
+      ) || projectUsers[0];
+
+    if (!assignee?.id) {
+      this.modalErrorMessage =
+        'No PIC is assigned to this project. Please contact your administrator.';
+      return;
+    }
+
+    // Backend menyimpan DATETIME MySQL: 'YYYY-MM-DD HH:mm:ss'.
+    const now = new Date();
+    const submitDate = this.toMySqlDateTime(now, this.formModel.submitDate);
+    const submitDateValue = new Date(submitDate.replace(' ', 'T'));
+
+    // deadlineDateTime = submitDate + durasi SLA (CR tidak punya severity → 0).
+    const deadlineDateTime = this.toMySqlDateTime(
+      this.addHours(submitDateValue, this.addHour),
+    );
+
+    // targetCompletionDate = submitDate + 50 menit (default awal).
+    const targetCompletionDate = this.toMySqlDateTime(
+      this.addHours(
+        submitDateValue,
+        this.targetCompletionOffsetMinutes / 60,
+      ),
+    );
+
+    const payload: any = {
+      title: this.formModel.title.trim(),
+      description: this.formModel.description.trim(),
+      projectId: this.formModel.projectId,
+      submitBy,
+      submitDate,
+      targetCompletionDate,
+      deadlineDateTime,
+      ticketStatusId: Number(this.formModel.ticketStatusId) || 1,
+      ticketCategoryId: this.formModel.ticketCategoryId
+        ? Number(this.formModel.ticketCategoryId)
+        : null,
+      productChildId: this.formModel.productChildId
+        ? Number(this.formModel.productChildId)
+        : null,
+      assignTo: String(assignee.id),
+    };
 
     this.saving = true;
     this.modalErrorMessage = '';
 
-    const today = new Date();
-    const hhiiss = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}:${String(today.getSeconds()).padStart(2, '0')}`;
-
-    // tolong buatkan tanggal dan jam hari ini di tambah 50 menit
-    const futureDate = new Date(today.getTime() + 50 * 60 * 1000);
-    const futureHhiiss = `${String(futureDate.getHours()).padStart(2, '0')}:${String(futureDate.getMinutes()).padStart(2, '0')}:${String(futureDate.getSeconds()).padStart(2, '0')}`;
-
-    this.apiService.get(`/client-portal/projects/detail/${this.formModel.projectId}`).subscribe({
-      next: (response) => {
-        this.loading = false;
-        const users = response?.data.users || null;
-
-        // cari asManager = 1
-        let asManager =
-          users?.find((user: any) => user?.asManager === 1) || null;
-        console.log('users', users);
-
-        if (!asManager) {
-          asManager = users?.[0] || null;
-        }
-        console.log('asManager', asManager.id);
-
-        const today = new Date();
-
-        // saya mau hhiiss ditambah 3 jam
-
-        
-
-        const addHour = this.addHour;
-        const threeHoursLater = new Date(
-          today.getTime() + addHour * 60 * 60 * 1000,
-        );
-        const hhiissPlus = threeHoursLater.toTimeString().split(' ')[0];
-        const deadlineDateTime =
-          `${this.formModel.submitDate}` + ' ' + hhiissPlus;
-
-        const payload: any = {
-          title: this.formModel.title.trim(),
-          description: this.formModel.description.trim(),
-          projectId: this.formModel.projectId,
-          submitBy,
-          submitDate: this.formModel.submitDate + `T${hhiiss}`,
-          targetCompletionDate: futureHhiiss,
-          ticketStatusId: Number(this.formModel.ticketStatusId),
-          ticketCategoryId: this.formModel.ticketCategoryId
-            ? Number(this.formModel.ticketCategoryId)
-            : null,
-        
-          deadlineDateTime: deadlineDateTime,
-          productChildId: this.formModel.productChildId
-            ? Number(this.formModel.productChildId)
-            : null,
-          assignTo: asManager.id,
-        };
-
-        this.apiService.post('/client-portal/change-requests', payload).subscribe({
-          next: () => {
-            this.saving = false;
-            this.modalRef?.close();
-            this.successMessage = 'Change request created successfully.';
-            this.loadCr();
-          },
-          error: (error) => {
-            this.saving = false;
-            this.modalErrorMessage =
-              error?.error?.message || 'Failed to create change request.';
-          },
-        });
+    this.apiService.post('/client-portal/change-requests', payload).subscribe({
+      next: () => {
+        this.saving = false;
+        this.modalRef?.close();
+        this.successMessage = 'Change request created successfully.';
+        this.loadCr();
       },
       error: (error) => {
-        this.loading = false;
-        this.errorMessage =
-          error?.error?.message || 'Failed to load project detail.';
+        this.saving = false;
+        this.modalErrorMessage =
+          error?.error?.message || 'Failed to create change request.';
       },
     });
+  }
+
+  /** Gabungkan tanggal (opsional 'YYYY-MM-DD') dengan jam dari `value`. */
+  private toMySqlDateTime(value: Date, dateOnly?: string): string {
+    const pickedDate = String(dateOnly || '').trim() || this.toDateValue(value);
+
+    return `${pickedDate} ${this.toTimeValue(value)}`;
+  }
+
+  private toDateValue(value: Date): string {
+    return `${value.getFullYear()}-${this.pad2(value.getMonth() + 1)}-${this.pad2(value.getDate())}`;
+  }
+
+  private toTimeValue(value: Date): string {
+    return `${this.pad2(value.getHours())}:${this.pad2(value.getMinutes())}:${this.pad2(value.getSeconds())}`;
+  }
+
+  private pad2(value: number): string {
+    return String(value).padStart(2, '0');
+  }
+
+  private addHours(value: Date, hours: number): Date {
+    return new Date(value.getTime() + hours * 60 * 60 * 1000);
   }
 
   trackByCase(_: number, row: any): string {

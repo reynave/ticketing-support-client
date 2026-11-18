@@ -4,6 +4,7 @@
 - [x] Implementasi login untuk client view (desain berbeda dari ng18 internal/admin).
 - [x] Batasi akses halaman hanya untuk CASES setelah user login.
 - [x] Setelah login sukses, redirect langsung ke halaman CASES.
+  - ℹ️ Kondisi kode saat ini: redirect pasca-login mengarah ke `/home` (dashboard), bukan `/cases`. Lihat `AI/agent-client.md` §6 & §14.
 - [x] Tata letak menu/tabs di bagian atas halaman.
 
 ## UI/UX

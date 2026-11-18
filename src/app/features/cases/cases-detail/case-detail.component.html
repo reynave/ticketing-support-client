@@ -13,8 +13,9 @@
           <label for="selectedStatusId" class="align-content-center"> Status</label>
           <select class="form-select" id="selectedStatusId" name="selectedStatusId" [(ngModel)]="selectedStatusId"
             [disabled]="detail.clientEditable == 0">
-            <option *ngFor="let status of statusOptions" [value]="status.id">{{ status.name }}</option>
-
+            @for (status of statusOptions; track status.id) {
+            <option [value]="status.id" *ngIf="status.id >= 400">{{ status.name }} </option>
+            }
           </select>
 
         </div>
@@ -117,34 +118,35 @@
 
             </div>
 
-            <div class="row g-3 mb-3">
-              <div class="col-12 col-md-6 col-lg-3">
-                <p class="meta-label mb-1">Status</p>
-                
-                  <div class="form-control bg-light">
-                    {{ detail?.ticketStatusName || detail?.ticketStatusId || '-' }}
-                  </div>
-               
-              </div>
-              <div class="col-12 col-md-6 col-lg-3">
-                <p class="meta-label mb-1">Severity</p>
-                 <div class="form-control bg-light">{{ detail?.ticketSeverityName || detail?.ticketSeverityId || '-' }}</div>
-              </div>
-              <div class="col-12 col-md-6 col-lg-3">
-                <p class="meta-label mb-1">Assign To</p>
-                <div class="form-control bg-light">{{ detail?.assignToName || detail?.assignTo || '-' }}</div>
-              </div>
-              @if(detail?.hours > 0){ 
-              <div class="col-12 col-md-6 col-lg-3">
-                <p class="meta-label mb-1">Estimation</p>
-                <div class="form-control bg-light">
-                  {{ detail?.ticketBased != 0  ? detail?.ticketEstimationCost + ' Tickets or'  || '' : '' }}  {{ detail?.hours || '0' }} Hours</div>
-              </div>
-              }
-              <!-- <div class="col-12 col-md-6 col-lg-4">
-                <p class="meta-label mb-1">Target Completion</p>
-                <p class="meta-value mb-0">{{ detail?.targetCompletionDate || detail?.deadlineDateTime || '-' }}</p>
-              </div> -->
+            <div class="table-responsive mb-3">
+              <table class="table table-sm align-middle mb-0 detail-table">
+                <tbody>
+                  <tr>
+                    <th scope="row">Status</th>
+                    <td>{{ detail?.ticketStatusName || detail?.ticketStatusId || '-' }}</td>
+                    <th scope="row">Category</th>
+                    <td>{{ detail?.ticketCategory || '-' }}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Severity</th>
+                    <td>{{ detail?.ticketSeverityName || detail?.ticketSeverityId || '-' }}</td>
+                    <th scope="row">Ticket Duration Respond Time</th>
+                    <td>{{ respondTimeLabel() }}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Product</th>
+                    <td>{{ detail?.productName || '-' }}</td>
+                    <th scope="row">Module</th>
+                    <td>{{ detail?.productChildName || detail?.productChildId || '-' }}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Assign To</th>
+                    <td>{{ detail?.assignToName || detail?.assignTo || '-' }}</td>
+                    <th scope="row">Estimation</th>
+                    <td>{{ estimationLabel() }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <div>

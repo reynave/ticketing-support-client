@@ -4,6 +4,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { forkJoin } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
+import { RouterLink } from '@angular/router';
 
 // Row shape returned by GET /client-ticket/cases and GET /client-ticket/change-requests
 interface TicketRow {
@@ -20,12 +21,13 @@ interface TicketRow {
 }
 
 interface RecentTicketRow {
-  crNoRef: string;
+  id: string;
   title: string;
   projectName: string;
   ticketStatusName: string;
   assignToName: string;
   submitDate: string;
+  detailRoute: string[];
 }
 
 interface StatCard {
@@ -52,7 +54,7 @@ const STATUS_COLOR_MAP: Record<string, string> = {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective],
+  imports: [CommonModule, BaseChartDirective, RouterLink],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -177,17 +179,26 @@ export class HomeComponent implements OnInit {
   }
 
   private updateRecentTickets(caseRows: TicketRow[], crRows: TicketRow[]): void {
-    this.recentTickets = [...caseRows, ...crRows]
+    this.recentTickets = [
+      ...caseRows.map((row) => this.toRecentTicket(row, '/cases')),
+      ...crRows.map((row) => this.toRecentTicket(row, '/cr')),
+    ]
       .sort((a, b) => new Date(b.submitDate).getTime() - new Date(a.submitDate).getTime())
-      .slice(0, RECENT_TICKETS_LIMIT)
-      .map((row) => ({
-        crNoRef: row.id,
-        title: row.title,
-        projectName: row.projectName,
-        ticketStatusName: row.ticketStatusName,
-        assignToName: row.assignToName,
-        submitDate: row.submitDate,
-      }));
+      .slice(0, RECENT_TICKETS_LIMIT);
+  }
+
+  private toRecentTicket(row: TicketRow, routeBase: string): RecentTicketRow {
+    const id = String(row.id || '').trim();
+
+    return {
+      id,
+      title: row.title,
+      projectName: row.projectName,
+      ticketStatusName: row.ticketStatusName,
+      assignToName: row.assignToName,
+      submitDate: row.submitDate,
+      detailRoute: [routeBase, id],
+    };
   }
 
   statusColor(status: string): string {

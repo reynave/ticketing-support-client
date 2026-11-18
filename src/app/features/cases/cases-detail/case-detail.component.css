@@ -32,6 +32,61 @@
   font-weight: 600;
 }
 
+.detail-table {
+  --bs-table-border-color: #e4ecea;
+}
+
+.detail-table th {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6d8783;
+  font-weight: 700;
+  background-color: #f7fbfb;
+}
+
+.detail-table td {
+  color: #234d47;
+  font-weight: 600;
+}
+
+/* Stack each field (label above value) on small screens */
+@media (max-width: 767.98px) {
+  .detail-table,
+  .detail-table tbody,
+  .detail-table tr,
+  .detail-table th,
+  .detail-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .detail-table tr {
+    padding: 0.45rem 0;
+    border-bottom: 1px solid #e4ecea;
+  }
+
+  .detail-table tr:last-child {
+    border-bottom: 0;
+  }
+
+  .detail-table th {
+    background-color: transparent;
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .detail-table td {
+    border-bottom: 0;
+    padding-top: 0.1rem;
+    padding-bottom: 0.55rem;
+  }
+
+  .detail-table td:last-child {
+    padding-bottom: 0;
+  }
+}
+
 .desc {
   color: #445d59;
 }

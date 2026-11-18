@@ -14,22 +14,26 @@
       <div class="nav-collapse" [class.show]="isMenuOpen">
         <ul class="navbar-nav nav-tabs-client">
           <li class="nav-item">
-            <a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+            <a class="nav-link" routerLink="/home" [class.active]="isSectionActive('home')"
+              [attr.aria-current]="isSectionActive('home') ? 'page' : null" (click)="closeMenu()">
               Home
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="/projects" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+            <a class="nav-link" routerLink="/projects" [class.active]="isSectionActive('projects')"
+              [attr.aria-current]="isSectionActive('projects') ? 'page' : null" (click)="closeMenu()">
               Projects
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="/cases" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+            <a class="nav-link" routerLink="/cases" [class.active]="isSectionActive('cases')"
+              [attr.aria-current]="isSectionActive('cases') ? 'page' : null" (click)="closeMenu()">
               Cases
             </a>
           </li>
            <li class="nav-item">
-            <a class="nav-link" routerLink="/cr" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+            <a class="nav-link" routerLink="/cr" [class.active]="isSectionActive('cr')"
+              [attr.aria-current]="isSectionActive('cr') ? 'page' : null" (click)="closeMenu()">
               Changes Request
             </a>
           </li>

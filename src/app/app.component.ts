@@ -12,11 +12,12 @@ export class AppComponent implements OnInit {
   private readonly authService = inject(AuthService);
 
   ngOnInit(): void {
+    // bootstrapSession() juga mengecek JWT expired (klaim `exp`) dan mengakhiri sesi,
+    // sehingga user diarahkan ke halaman login untuk login ulang.
     this.authService.bootstrapSession();
 
-     setInterval(() => {
+    setInterval(() => {
       window.location.reload();
-    }, 1000 * 60 * 55); // 5 minutes
-    
+    }, 1000 * 60 * 55); // 55 minutes
   }
 }

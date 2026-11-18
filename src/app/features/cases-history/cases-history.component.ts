@@ -31,6 +31,9 @@ export class CasesHistoryComponent implements OnInit {
   keyword = '';
   selectedStatus = '';
 
+  /** Penanda request terakhir, supaya respons lama tidak menimpa hasil filter terbaru. */
+  private loadRequestId = 0;
+
   saving = false;
   loadingOptions = false;
   modalErrorMessage = '';
@@ -53,6 +56,7 @@ export class CasesHistoryComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
+    const requestId = ++this.loadRequestId;
     const query: any = {};
 
     if (this.keyword.trim()) {
@@ -65,15 +69,25 @@ export class CasesHistoryComponent implements OnInit {
 
     this.apiService.get('/client-portal/cases/closed', query).subscribe({
       next: (response) => {
+        if (requestId !== this.loadRequestId) {
+          return;
+        }
+
         this.loading = false;
         this.closedRows = Array.isArray(response?.data) ? response.data : [];
 
-        //saya mau gambungakn array this.row dengan this.closedRows
-        this.rows = [...this.rows, ...this.closedRows];
+        // Selalu ganti isi list dengan hasil filter terbaru (jangan di-append),
+        // supaya keyword/pagination tidak menumpuk data lama.
+        this.rows = [...this.closedRows];
       },
       error: (error) => {
+        if (requestId !== this.loadRequestId) {
+          return;
+        }
+
         this.loading = false;
         this.closedRows = [];
+        this.rows = [];
         this.errorMessage =
           error?.error?.message || 'Failed to load cases list.';
       },

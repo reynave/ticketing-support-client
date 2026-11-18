@@ -10,6 +10,8 @@ interface LoginForm {
   password: string;
 }
 
+const MAX_TIMEOUT_DELAY = 2147483647; // batas maksimal setTimeout (~24.8 hari)
+
 @Injectable({
   providedIn: 'root',
 })
@@ -25,6 +27,8 @@ export class AuthService {
   private readonly currentUserSubject = new BehaviorSubject<any | null>(null);
   readonly currentUser$ = this.currentUserSubject.asObservable();
 
+  private expiryTimer: ReturnType<typeof setTimeout> | null = null;
+
   get token(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
@@ -34,7 +38,7 @@ export class AuthService {
   }
 
   get isAuthenticated(): boolean {
-    return !!this.token;
+    return !!this.token && !this.isTokenExpired();
   }
 
   bootstrapSession(): void {
@@ -47,6 +51,12 @@ export class AuthService {
       return;
     }
 
+    if (this.isTokenExpired(token)) {
+      // Token sudah expired: bersihkan sesi, guard akan mengarahkan ke /login?reason=expired.
+      this.clearSession();
+      return;
+    }
+
     if (storedUser) {
       try {
         this.currentUserSubject.next(JSON.parse(storedUser));
@@ -55,6 +65,7 @@ export class AuthService {
       }
     }
 
+    this.startExpiryWatcher(token);
     this.fetchMe().subscribe();
   }
 
@@ -69,6 +80,7 @@ export class AuthService {
         }
 
         localStorage.setItem(this.tokenKey, token);
+        this.startExpiryWatcher(token);
 
         if (user) {
           localStorage.setItem(this.userKey, JSON.stringify(user));
@@ -98,31 +110,116 @@ export class AuthService {
   }
 
   logout(redirectToLogin = true): void {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.userKey);
-    localStorage.removeItem(this.legacyTokenKey);
-    localStorage.removeItem(this.legacyUserKey);
-    this.currentUserSubject.next(null);
+    this.clearSession();
 
     if (redirectToLogin) {
       void this.router.navigateByUrl('/login');
     }
   }
 
-  decodeToken(): Record<string, any> | null {
-    const token = this.token;
+  /**
+   * Akhiri sesi karena token JWT sudah expired, lalu arahkan user login ulang.
+   * Dipakai oleh expiry watcher (token habis saat app terbuka) dan auth interceptor (401).
+   */
+  handleSessionExpired(): void {
+    this.clearSession();
 
+    if (this.isLoginPage()) {
+      return;
+    }
+
+    void this.router.navigate(['/login'], { queryParams: { reason: 'expired' } });
+  }
+
+  /**
+   * Cek klaim `exp` pada JWT. Token tanpa klaim `exp` dianggap belum expired
+   * (validasi akhir tetap dilakukan backend).
+   */
+  isTokenExpired(token: string | null = this.token): boolean {
+    const expiresAt = this.getTokenExpiresAt(token);
+
+    if (expiresAt === null) {
+      return false;
+    }
+
+    return expiresAt <= Date.now();
+  }
+
+  getTokenExpiresAt(token: string | null = this.token): number | null {
+    const payload = this.decodeToken(token);
+    const exp = payload?.['exp'];
+
+    if (typeof exp !== 'number' || !Number.isFinite(exp)) {
+      return null;
+    }
+
+    return exp * 1000;
+  }
+
+  decodeToken(token: string | null = this.token): Record<string, any> | null {
     if (!token) {
       return null;
     }
 
     try {
       const payload = token.split('.')[1];
-      const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-      return JSON.parse(decoded);
+
+      if (!payload) {
+        return null;
+      }
+
+      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = normalized.padEnd(
+        normalized.length + ((4 - (normalized.length % 4)) % 4),
+        '=',
+      );
+
+      return JSON.parse(atob(padded));
     } catch {
       return null;
     }
+  }
+
+  private startExpiryWatcher(token: string | null): void {
+    this.clearExpiryWatcher();
+
+    const expiresAt = this.getTokenExpiresAt(token);
+
+    if (expiresAt === null) {
+      return;
+    }
+
+    const remaining = expiresAt - Date.now();
+
+    if (remaining <= 0) {
+      this.handleSessionExpired();
+      return;
+    }
+
+    this.expiryTimer = setTimeout(() => {
+      this.expiryTimer = null;
+      this.handleSessionExpired();
+    }, Math.min(remaining, MAX_TIMEOUT_DELAY));
+  }
+
+  private clearExpiryWatcher(): void {
+    if (this.expiryTimer !== null) {
+      clearTimeout(this.expiryTimer);
+      this.expiryTimer = null;
+    }
+  }
+
+  private clearSession(): void {
+    this.clearExpiryWatcher();
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.legacyTokenKey);
+    localStorage.removeItem(this.legacyUserKey);
+    this.currentUserSubject.next(null);
+  }
+
+  private isLoginPage(): boolean {
+    return this.router.url.split('?')[0] === '/login';
   }
 
   private migrateLegacySession(): void {

@@ -28,6 +28,7 @@ statusOptions : any = [];
   updatingStatus = false;
   statusErrorMessage = '';
   statusSuccessMessage = '';
+  ticketSeverities: any[] = [];
  
   ngOnInit(): void {
     this.caseId = String(this.route.snapshot.paramMap.get('id') || '').trim();
@@ -37,6 +38,7 @@ statusOptions : any = [];
       return;
     }
     this.loadMasterDataQuestions(); 
+    this.loadTicketSeverities();
     this.loadDetail();
 
     this.loadLogs();
@@ -64,6 +66,93 @@ statusOptions : any = [];
         this.errorMessage = error?.error?.message || 'Failed to load case detail.';
       },
     });
+  }
+
+  /**
+   * Read-only master data, only used to show the respond time duration
+   * (ticket_severity.duration) on the detail page.
+   */
+  loadTicketSeverities(): void {
+    this.apiService
+      .get('/client-portal/master/ticket-severities', { presence: 1 })
+      .subscribe({
+        next: (response) => {
+          this.ticketSeverities = Array.isArray(response?.data)
+            ? response.data
+            : [];
+        },
+        error: () => {
+          this.ticketSeverities = [];
+        },
+      });
+  }
+
+  /**
+   * Ticket severity duration from API is stored in hours.
+   * Converts it into a readable label, e.g. 120 -> "5 Days", 4 -> "4 Hours",
+   * 30 -> "1 Day 6 Hours".
+   */
+  severityDurationLabel(duration: number | string | null | undefined): string {
+    const totalHours = Number(duration);
+
+    if (!Number.isFinite(totalHours) || totalHours <= 0) {
+      return '-';
+    }
+
+    const days = Math.floor(totalHours / 24);
+    const hours = totalHours - days * 24;
+    const parts: string[] = [];
+
+    if (days > 0) {
+      parts.push(`${days} ${days === 1 ? 'Day' : 'Days'}`);
+    }
+
+    if (hours > 0) {
+      parts.push(`${hours} ${hours === 1 ? 'Hour' : 'Hours'}`);
+    }
+
+    return parts.join(' ');
+  }
+
+  /**
+   * Read-only label for "Ticket Duration Respond Time", e.g. "Medium (5 Days)".
+   */
+  respondTimeLabel(): string {
+    const severityName = this.detail?.ticketSeverityName || '';
+    const severity = this.ticketSeverities.find(
+      (item) =>
+        String(item?.id) === String(this.detail?.ticketSeverityId ?? ''),
+    );
+
+    const durationLabel = severity
+      ? this.severityDurationLabel(severity.duration)
+      : '-';
+
+    if (severityName && durationLabel !== '-') {
+      return `${severityName} (${durationLabel})`;
+    }
+
+    return severityName || durationLabel || '-';
+  }
+
+  /**
+   * Read-only label for "Estimation", e.g. "5 Tickets or 10 Hours" / "10 Hours".
+   * Returns '-' when the case has no estimation yet.
+   */
+  estimationLabel(): string {
+    const hours = Number(this.detail?.hours || 0);
+
+    if (!Number.isFinite(hours) || hours <= 0) {
+      return '-';
+    }
+
+    const ticketCost = Number(this.detail?.ticketEstimationCost || 0);
+
+    if (Number(this.detail?.ticketBased || 0) !== 0) {
+      return `${ticketCost} Tickets or ${hours} Hours`;
+    }
+
+    return `${hours} Hours`;
   }
 
   loadStatusOptions(): void {
